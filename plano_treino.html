@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>🏊 Plano Treino 12 Semanas</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, serif;
+    background: linear-gradient(160deg, #0a1628 0%, #0D7377 50%, #14A0C4 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    padding-bottom: 80px;
+  }
+  button { cursor: pointer; font-family: inherit; }
+
+  /* HEADER */
+  .header {
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-sub { font-size: 11px; letter-spacing: 3px; opacity: 0.6; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title { font-size: 22px; font-weight: bold; letter-spacing: -0.5px; }
+  .progress-bar-wrap { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+  .progress-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #4CAF50; border-radius: 99px; transition: width 0.5s ease; }
+  .progress-label { font-size: 12px; opacity: 0.8; }
+
+  /* NAV */
+  .nav { display: flex; gap: 8px; padding: 16px 16px 0; }
+  .nav-btn {
+    flex: 1; padding: 9px 4px; border-radius: 10px; border: none;
+    background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+    font-size: 13px; transition: all 0.2s;
+  }
+  .nav-btn.active { background: rgba(255,255,255,0.95); color: #0D7377; font-weight: bold; }
+
+  /* NOTIFICATION */
+  .notif {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: #4CAF50; color: #fff; padding: 10px 20px;
+    border-radius: 99px; font-size: 14px; font-weight: bold; z-index: 999;
+    box-shadow: 0 4px 20px rgba(76,175,80,0.4);
+    animation: fadeIn 0.2s ease;
+    white-space: nowrap;
+  }
+  @keyframes fadeIn { from { opacity:0; transform: translateX(-50%) translateY(-8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  /* CARDS */
+  .card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 16px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .card-dark { background: rgba(255,255,255,0.05); }
+
+  /* WEEK SELECTOR */
+  .week-selector { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .week-arrow {
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    width: 36px; height: 36px; border-radius: 10px; font-size: 18px;
+  }
+  .week-center { text-align: center; }
+  .week-title { font-size: 20px; font-weight: bold; }
+  .week-phase { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #14A0C4; margin-top: 2px; }
+
+  /* DAY CARDS */
+  .day-btn {
+    width: 100%; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px; padding: 12px 16px;
+    text-align: left; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.2s; margin-bottom: 2px;
+  }
+  .day-btn.expanded { border-radius: 14px 14px 0 0; background: rgba(255,255,255,0.18); }
+  .day-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: bold; transition: background 0.3s; flex-shrink: 0;
+  }
+  .day-icon.done { background: #4CAF50; }
+  .day-info { margin-left: 12px; flex: 1; }
+  .day-name { font-weight: bold; font-size: 15px; }
+  .day-sub { font-size: 12px; opacity: 0.65; margin-top: 1px; }
+  .day-right { display: flex; align-items: center; gap: 8px; }
+
+  /* SESSION PANEL */
+  .session-panel {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-top: none; border-radius: 0 0 14px 14px;
+    padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .session-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 12px 14px; transition: all 0.2s;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .session-card.done { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.4); }
+  .session-content { flex: 1; }
+  .session-badge {
+    font-size: 11px; font-weight: bold; letter-spacing: 1px;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 6px;
+    display: inline-block; margin-bottom: 6px;
+  }
+  .session-label { font-weight: bold; font-size: 15px; margin-bottom: 6px; display: block; }
+  .session-desc { font-size: 13px; opacity: 0.8; line-height: 1.4; }
+  .session-desc-item { padding-left: 8px; border-left: 2px solid rgba(255,255,255,0.2); margin-bottom: 3px; }
+  .check-btn {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 18px; flex-shrink: 0; margin-left: 10px;
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  .check-btn.done { background: #4CAF50; border-color: #4CAF50; }
+
+  /* OVERVIEW */
+  .phase-header {
+    border-radius: 12px 12px 0 0; padding: 10px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .phase-body {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 16px;
+  }
+  .week-row {
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .week-row:last-child { border-bottom: none; }
+  .week-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 13px; color: rgba(255,255,255,0.7);
+    flex-shrink: 0;
+  }
+  .week-num.done { background: #4CAF50; color: #fff; }
+  .mini-bar-bg { height: 5px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .mini-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
+
+  /* PROGRESS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card { background: rgba(255,255,255,0.09); border-radius: 14px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.12); }
+  .stat-icon { font-size: 22px; }
+  .stat-value { font-size: 24px; font-weight: bold; margin-top: 4px; }
+  .stat-label { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+  .milestone {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  }
+  .milestone-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .milestone-dot.done { background: #4CAF50; border-color: #4CAF50; }
+  .milestone-dot.goal { background: rgba(255,215,0,0.2); border-color: #FFD700; }
+  .reset-btn {
+    width: 100%; margin-top: 14px; padding: 12px;
+    background: rgba(255,50,50,0.12); border: 1px solid rgba(255,50,50,0.25);
+    border-radius: 12px; color: rgba(255,100,100,0.9); font-size: 14px;
+  }
+
+  .page { padding: 16px 16px 0; display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-sub">Plano 12 Semanas</div>
+  <div class="header-title">🏊 Natação + 💪 Calistenia</div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="globalBar" style="width:0%"></div>
+    </div>
+    <span class="progress-label" id="globalLabel">0/0 sessões</span>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif" style="display:none"></div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showView('week')">Semana</button>
+  <button class="nav-btn" onclick="showView('overview')">Visão Geral</button>
+  <button class="nav-btn" onclick="showView('progress')">Progresso</button>
+</div>
+
+<!-- VIEW: SEMANA -->
+<div class="page active" id="view-week">
+  <div class="card" style="margin-top:16px">
+    <div class="week-selector">
+      <button class="week-arrow" onclick="changeWeek(-1)">‹</button>
+      <div class="week-center">
+        <div class="week-title" id="weekTitle">Semana 1</div>
+        <div class="week-phase" id="weekPhase">FASE 1 — Adaptação</div>
+      </div>
+      <button class="week-arrow" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="weekBar" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="weekLabel">0/0</span>
+    </div>
+  </div>
+  <div id="dayList"></div>
+</div>
+
+<!-- VIEW: VISÃO GERAL -->
+<div class="page" id="view-overview">
+  <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin:16px 0 12px">12 Semanas — Todas as Fases</div>
+  <div id="overviewList"></div>
+</div>
+
+<!-- VIEW: PROGRESSO -->
+<div class="page" id="view-progress">
+  <div class="stats-grid" style="margin-top:16px" id="statsGrid"></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span style="font-weight:bold">Progresso Geral</span>
+      <span style="opacity:0.7;font-size:14px" id="progressTotal"></span>
+    </div>
+    <div class="progress-bar-bg" style="height:12px">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%;background:linear-gradient(90deg,#0D7377,#14A0C4,#4CAF50)"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-weight:bold;margin-bottom:14px">🏆 Marcos da Jornada</div>
+    <div id="milestones"></div>
+  </div>
+  <button class="reset-btn" onclick="resetProgress()">🗑 Resetar progresso</button>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const NATACAO = {
+  1:"5×2min | +1min pausa | Foco: braçada consistente",
+  2:"5×2min | +1min pausa | Varie crawl/costas",
+  3:"5×2min | +1min pausa | Tente aumentar ritmo",
+  4:"6×2,5min | +45s pausa | 2 costas + 4 crawl",
+  5:"6×2,5min | +45s pausa | Aumente cadência",
+  6:"6×2,5min | +45s pausa | Foco na técnica",
+  7:"5×4min | +1min pausa | +1 sprint 30s ao final",
+  8:"5×4min | +1min pausa | +1 sprint 30s",
+  9:"4×5min | +1min pausa | +2 sprints ao final",
+  10:"4×5min | +1min pausa | +2 sprints",
+  11:"4×5min | +1min pausa | Técnica + resistência",
+  12:"4×5min | +1min pausa | Sessão de performance total",
+};
+
+const CALISTENIA = {
+  1:["Dead hang 3×20s","Scapular pull 3×8","Flexão joelho 3×10","Prancha 3×30s","Knee raise 3×8"],
+  2:["Dead hang 3×25s","Scapular pull 3×8","Flexão joelho 3×12","Prancha 3×35s","Knee raise 3×10"],
+  3:["Dead hang 3×30s","Scapular pull 3×10","Flexão 3×10","Prancha 3×40s","Knee raise 3×12"],
+  4:["Dead hang 3×35s","Scapular pull 3×10","Flexão 3×12","Prancha larga 2×8","Knee raise 3×12"],
+  5:["Scapular pull 3×10","Negativa barra 4×3 (5s)","Flexão 4×10","Prancha lateral 3×25s","Knee raise 3×12"],
+  6:["Scapular pull 3×10","Negativa barra 4×4 (5s)","Flexão 4×12","Prancha lateral 3×30s","Knee raise 3×15"],
+  7:["Scapular pull 3×10","Negativa barra 4×5 (5s)","Flexão elevada 2×8","Prancha 3×45s","Knee raise 3×15"],
+  8:["Scapular pull 3×10","Negativa barra 4×5 (6s)","Flexão elevada 3×8","Prancha 3×45s","L-sit 3×15s"],
+  9:["Negativa 4×5 (7s)","Barra c/ elástico 4×3","Scapular pull 2×10","Dead hang máximo","Knee raise 3×15"],
+  10:["Negativa 4×5 (7s)","Barra c/ elástico 4×4","Flexão elevada 4×10","Prancha 3×45s","Dragon flag 3×3"],
+  11:["Negativa 4×5 (8s)","Barra c/ elástico 4×5","Flexão diamante 3×8","Prancha 3×50s","Dragon flag 3×3"],
+  12:["Negativa 4×5 (8s)","BARRA COMPLETA — tente!","Flexão diamante 3×10","Prancha 3×60s","Dragon flag 3×5"],
+};
+
+const PHASES = [
+  {name:"FASE 1",label:"Adaptação",weeks:[1,2,3,4],color:"#0D7377"},
+  {name:"FASE 2",label:"Construção",weeks:[5,6,7,8],color:"#14A0C4"},
+  {name:"FASE 3",label:"Performance",weeks:[9,10,11,12],color:"#1B2A4A"},
+];
+
+const DAY_NAMES = ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+
+function getWeekSessions(w) {
+  return [
+    {day:0,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},
+    {day:0,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},
+    {day:1,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},
+    {day:1,period:"noite",type:"rest",label:"😴 Recuperação",desc:["Alongamento e mobilidade 15 min"]},
+    {day:2,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},
+    {day:2,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},
+    {day:3,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},
+    {day:3,period:"noite",type:"rest",label:"😴 Recuperação",desc:["Alongamento e mobilidade 15 min"]},
+    {day:4,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},
+    {day:4,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},
+    {day:5,period:"dia",type:"off",label:"🏖 Descanso ativo",desc:["Caminhada ou mobilidade leve"]},
+    {day:6,period:"dia",type:"off",label:"🏖 Descanso total",desc:["Recuperação completa"]},
+  ];
+}
+
+function getPhase(w) { return PHASES.find(p=>p.weeks.includes(w))||PHASES[0]; }
+function sessionKey(w,d,p) { return `w${w}_d${d}_${p}`; }
+
+function getProgress(w) {
+  const sessions = getWeekSessions(w).filter(s=>s.type!=="off");
+  const done = sessions.filter(s=>checks[sessionKey(w,s.day,s.period)]).length;
+  return {done, total:sessions.length};
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentWeek = 1;
+let expandedDay = null;
+let checks = {};
+try { checks = JSON.parse(localStorage.getItem("treino_checks")||"{}"); } catch{}
+
+function saveChecks() {
+  try { localStorage.setItem("treino_checks", JSON.stringify(checks)); } catch{}
+}
+
+// ── VIEWS ─────────────────────────────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("view-"+v).classList.add("active");
+  const btns = document.querySelectorAll(".nav-btn");
+  const map = {week:0,overview:1,progress:2};
+  btns[map[v]].classList.add("active");
+  if(v==="week") renderWeek();
+  if(v==="overview") renderOverview();
+  if(v==="progress") renderProgress();
+}
+
+// ── WEEK VIEW ─────────────────────────────────────────────────────────────────
+function changeWeek(d) {
+  currentWeek = Math.max(1, Math.min(12, currentWeek+d));
+  expandedDay = null;
+  renderWeek();
+}
+
+function renderWeek() {
+  const phase = getPhase(currentWeek);
+  document.getElementById("weekTitle").textContent = `Semana ${currentWeek}`;
+  document.getElementById("weekPhase").textContent = `${phase.name} — ${phase.label}`;
+  document.getElementById("weekPhase").style.color = phase.color === "#1B2A4A" ? "#14A0C4" : phase.color;
+
+  const {done,total} = getProgress(currentWeek);
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById("weekBar").style.width = pct+"%";
+  document.getElementById("weekBar").style.background = pct===100?"#4CAF50":"#14A0C4";
+  document.getElementById("weekLabel").textContent = `${done}/${total}`;
+
+  updateGlobal();
+
+  const sessions = getWeekSessions(currentWeek);
+  let html = "";
+
+  for(let dayIdx=0; dayIdx<7; dayIdx++) {
+    const daySessions = sessions.filter(s=>s.day===dayIdx);
+    const isExp = expandedDay===dayIdx;
+    const dayDone = daySessions.filter(s=>s.type!=="off"&&checks[sessionKey(currentWeek,s.day,s.period)]).length;
+    const dayTotal = daySessions.filter(s=>s.type!=="off").length;
+    const allOff = daySessions.every(s=>s.type==="off");
+    const allDone = dayTotal>0 && dayDone===dayTotal;
+
+    const iconClass = allOff?"":"" + (allDone?" done":"");
+    const iconContent = allOff?"🏖":(allDone?"✅":DAY_NAMES[dayIdx].substring(0,3));
+    const subLabels = daySessions.map(s=>s.label).join(" • ");
+
+    html += `
+      <button class="day-btn${isExp?" expanded":""}" onclick="toggleDay(${dayIdx})">
+        <div style="display:flex;align-items:center;flex:1">
+          <div class="day-icon${allDone?" done":""}">${iconContent}</div>
+          <div class="day-info">
+            <div class="day-name">${DAY_NAMES[dayIdx]}</div>
+            <div class="day-sub">${allOff?"Descanso":subLabels}</div>
+          </div>
+        </div>
+        <div class="day-right">
+          ${!allOff?`<span style="font-size:12px;opacity:0.7">${dayDone}/${dayTotal}</span>`:""}
+          <span style="opacity:0.4;font-size:16px">${isExp?"▲":"▼"}</span>
+        </div>
+      </button>`;
+
+    if(isExp) {
+      html += `<div class="session-panel">`;
+      for(const sess of daySessions) {
+        const key = sessionKey(currentWeek, sess.day, sess.period);
+        const isDone = checks[key];
+        const isOff = sess.type==="off"||sess.type==="rest";
+        const typeColors = {swim:"#14A0C4",cali:"#0D7377",rest:"#6B8CAE",off:"#B0C4DE"};
+        const c = typeColors[sess.type]||"#888";
+
+        html += `<div class="session-card${isDone?" done":""}">
+          <div class="session-content">
+            <span class="session-badge" style="background:${c}33;color:${c};border:1px solid ${c}55">${sess.period}</span>
+            <span class="session-label">${sess.label}</span>
+            <div>`;
+        if(sess.desc.length>1) {
+          for(const d of sess.desc) html += `<div class="session-desc session-desc-item">${d}</div>`;
+        } else {
+          html += `<div class="session-desc">${sess.desc[0]}</div>`;
+        }
+        html += `</div></div>`;
+        if(!isOff) {
+          html += `<button class="check-btn${isDone?" done":""}" onclick="toggleCheck(${currentWeek},${sess.day},'${sess.period}')">${isDone?"✓":""}</button>`;
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+  }
+
+  document.getElementById("dayList").innerHTML = html;
+}
+
+function toggleDay(d) {
+  expandedDay = expandedDay===d ? null : d;
+  renderWeek();
+}
+
+function toggleCheck(w,d,p) {
+  const key = sessionKey(w,d,p);
+  checks[key] = !checks[key];
+  saveChecks();
+  if(checks[key]) showNotif("✅ Treino marcado! Continue assim!");
+  renderWeek();
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+function renderOverview() {
+  let html = "";
+  for(const phase of PHASES) {
+    html += `<div>
+      <div class="phase-header" style="background:${phase.color}">
+        <div>
+          <div style="font-weight:bold;font-size:15px">${phase.name} — ${phase.label}</div>
+          <div style="font-size:11px;opacity:0.75">Semanas ${phase.weeks[0]}–${phase.weeks[phase.weeks.length-1]}</div>
+        </div>
+      </div>
+      <div class="phase-body">`;
+
+    for(let i=0;i<phase.weeks.length;i++) {
+      const w = phase.weeks[i];
+      const {done,total} = getProgress(w);
+      const pct = total ? Math.round((done/total)*100) : 0;
+      const isLast = i===phase.weeks.length-1;
+      html += `
+        <div class="week-row" onclick="currentWeek=${w};expandedDay=null;showView('week')" style="${isLast?"border-bottom:none":""}">
+          <div class="week-num${pct===100?" done":""}">${pct===100?"✓":w}</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:bold">Semana ${w}</div>
+            <div class="mini-bar-bg">
+              <div class="mini-bar-fill" style="width:${pct}%;background:${pct===100?"#4CAF50":phase.color}"></div>
+            </div>
+          </div>
+          <div style="font-size:12px;opacity:0.65;margin:0 8px">${done}/${total}</div>
+          <div style="opacity:0.4">›</div>
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  document.getElementById("overviewList").innerHTML = html;
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function renderProgress() {
+  const totalSessions = Array.from({length:12},(_,i)=>i+1)
+    .flatMap(w=>getWeekSessions(w).filter(s=>s.type!=="off")).length;
+  const totalDone = Object.values(checks).filter(Boolean).length;
+  const pct = Math.round((totalDone/totalSessions)*100);
+
+  document.getElementById("statsGrid").innerHTML = `
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">${totalDone}</div><div class="stat-label">Sessões feitas</div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value">${pct}%</div><div class="stat-label">% Completo</div></div>
+    <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">${currentWeek}</div><div class="stat-label">Semana atual</div></div>
+    <div class="stat-card"><div class="stat-icon">💪</div><div class="stat-value">10 🏆</div><div class="stat-label">Meta: barras</div></div>
+  `;
+
+  document.getElementById("progressTotal").textContent = `${totalDone}/${totalSessions} sessões`;
+  document.getElementById("progressBar").style.width = pct+"%";
+
+  // milestones
+  const w1 = getProgress(1);
+  const fase1done = [1,2,3,4].every(w=>{ const p=getProgress(w); return p.done===p.total; });
+  const fase2done = [5,6,7,8].every(w=>{ const p=getProgress(w); return p.done===p.total; });
+
+  const milestones = [
+    {label:"Primeira semana completa", done: w1.done===w1.total&&w1.total>0},
+    {label:"Primeira negativa na barra", note:"Semana 5", done: [5,6,7,8,9,10,11,12].some(w=>{
+      const s = getWeekSessions(w).find(s=>s.type==="cali");
+      return s && checks[sessionKey(w,s.day,s.period)];
+    })},
+    {label:"Fase 1 concluída (4 semanas)", done: fase1done},
+    {label:"Fase 2 concluída (8 semanas)", done: fase2done},
+    {label:"10 barras completas! 🎉", done: false, isGoal: true},
+  ];
+
+  let mHtml = "";
+  for(const m of milestones) {
+    mHtml += `<div class="milestone">
+      <div class="milestone-dot${m.done?" done":m.isGoal?" goal":""}">${m.done?"✓":m.isGoal?"🏆":""}</div>
+      <div>
+        <div style="font-size:14px;font-weight:${m.isGoal?"bold":"normal"}">${m.label}</div>
+        ${m.note?`<div style="font-size:12px;opacity:0.55">${m.note}</div>`:""}
+      </div>
+    </div>`;
+  }
+  document.getElementById("milestones").innerHTML = mHtml;
+}
+
+function updateGlobal() {
+  const totalSessions = Array.from({length:12},(_,i)=>i+1)
+    .flatMap(w=>getWeekSessions(w).filter(s=>s.type!=="off")).length;
+  const totalDone = Object.values(checks).filter(Boolean).length;
+  const pct = Math.round((totalDone/totalSessions)*100);
+  document.getElementById("globalBar").style.width = pct+"%";
+  document.getElementById("globalLabel").textContent = `${totalDone}/${totalSessions} sessões`;
+}
+
+function showNotif(msg) {
+  const n = document.getElementById("notif");
+  n.textContent = msg;
+  n.style.display = "block";
+  setTimeout(()=>n.style.display="none", 2200);
+}
+
+function resetProgress() {
+  if(confirm("Zerar todo o progresso?")) {
+    checks = {};
+    saveChecks();
+    renderWeek();
+    updateGlobal();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderWeek();
+updateGlobal();
+</script>
+</body>
+</html>
