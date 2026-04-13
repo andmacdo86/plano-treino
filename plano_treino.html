@@ -8,361 +8,335 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a1628">
 <link rel="manifest" href="manifest.json">
-<title>🏊 Plano Treino 12 Semanas</title>
+<title>Plano Treino 12 Semanas</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Georgia, serif;
-    background: linear-gradient(160deg, #0a1628 0%, #0D7377 50%, #14A0C4 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: #fff;
-    padding-bottom: 100px;
-  }
-  button { cursor: pointer; font-family: inherit; }
-
-  .header {
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(12px);
-    padding: 18px 20px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .header-sub { font-size: 11px; letter-spacing: 3px; opacity: 0.6; text-transform: uppercase; margin-bottom: 4px; }
-  .header-title { font-size: 21px; font-weight: bold; }
-  .progress-bar-wrap { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
-  .progress-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
-  .progress-label { font-size: 12px; opacity: 0.8; white-space: nowrap; }
-
-  .nav { display: flex; gap: 8px; padding: 14px 16px 0; }
-  .nav-btn { flex: 1; padding: 9px 4px; border-radius: 10px; border: none; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 13px; transition: all 0.2s; }
-  .nav-btn.active { background: rgba(255,255,255,0.95); color: #0D7377; font-weight: bold; }
-
-  .notif {
-    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-    color: #fff; padding: 10px 20px; border-radius: 99px;
-    font-size: 14px; font-weight: bold; z-index: 999;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    animation: fadeIn 0.2s ease; white-space: nowrap;
-  }
-  @keyframes fadeIn { from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
-
-  .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
-
-  .week-selector { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .week-arrow { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 10px; font-size: 18px; transition: all 0.2s; }
-  .week-arrow:disabled { opacity: 0.25; cursor: not-allowed; }
-  .week-center { text-align: center; }
-  .week-title { font-size: 20px; font-weight: bold; }
-  .week-phase { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-
-  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 10px; }
-  .status-ok    { background: rgba(76,175,80,0.2);   border: 1px solid rgba(76,175,80,0.5);   color: #81C784; }
-  .status-warn  { background: rgba(255,193,7,0.2);   border: 1px solid rgba(255,193,7,0.5);   color: #FFD54F; }
-  .status-block { background: rgba(244,67,54,0.2);   border: 1px solid rgba(244,67,54,0.5);   color: #EF9A9A; }
-  .status-done  { background: rgba(76,175,80,0.3);   border: 1px solid rgba(76,175,80,0.6);   color: #A5D6A7; }
-  .status-lock  { background: rgba(100,100,100,0.2); border: 1px solid rgba(150,150,150,0.4); color: #aaa; }
-
-  .threshold-wrap { margin-top: 10px; }
-  .threshold-label { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.75; margin-bottom: 6px; }
-  input[type=range] { width: 100%; accent-color: #14A0C4; }
-
-  .day-btn { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 12px 16px; text-align: left; color: #fff; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; margin-bottom: 2px; }
-  .day-btn.expanded { border-radius: 14px 14px 0 0; background: rgba(255,255,255,0.18); }
-  .day-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; transition: background 0.3s; flex-shrink: 0; }
-  .day-icon.done { background: #4CAF50; }
-  .day-info { margin-left: 12px; flex: 1; }
-  .day-name { font-weight: bold; font-size: 15px; }
-  .day-sub { font-size: 12px; opacity: 0.65; margin-top: 1px; }
-  .day-right { display: flex; align-items: center; gap: 8px; }
-
-  .session-panel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); border-top: none; border-radius: 0 0 14px 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-  .session-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 14px; transition: all 0.2s; display: flex; align-items: flex-start; justify-content: space-between; }
-  .session-card.done { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.4); }
-  .session-badge { font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; }
-  .session-label { font-weight: bold; font-size: 15px; margin-bottom: 6px; display: block; }
-  .session-desc { font-size: 13px; opacity: 0.8; line-height: 1.4; }
-  .session-desc-item { padding-left: 8px; border-left: 2px solid rgba(255,255,255,0.2); margin-bottom: 3px; }
-  .check-btn { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: #fff; font-size: 18px; flex-shrink: 0; margin-left: 10px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-  .check-btn.done { background: #4CAF50; border-color: #4CAF50; }
-
-  .debt-panel { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
-  .debt-title { font-weight: bold; font-size: 14px; color: #FFD54F; margin-bottom: 10px; }
-  .debt-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
-  .debt-item:last-child { margin-bottom: 0; }
-  .debt-check { background: rgba(255,193,7,0.2); border: 2px solid rgba(255,193,7,0.5); border-radius: 8px; width: 36px; height: 36px; color: #FFD54F; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .debt-check.done { background: #4CAF50; border-color: #4CAF50; color: #fff; }
-
-  .phase-header { border-radius: 12px 12px 0 0; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
-  .phase-body { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-top: none; border-radius: 0 0 12px 12px; margin-bottom: 16px; }
-  .week-row { padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .week-row:last-child { border-bottom: none; }
-  .week-num { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; color: rgba(255,255,255,0.7); flex-shrink: 0; }
-  .week-num.done { background: #4CAF50; color: #fff; }
-  .week-num.warn { background: #FF9800; color: #fff; }
-  .week-num.lock { background: rgba(80,80,80,0.3); color: #666; }
-  .mini-bar-bg { height: 5px; background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; margin-top: 4px; }
-  .mini-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s; }
-
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .stat-card { background: rgba(255,255,255,0.09); border-radius: 14px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.12); }
-  .stat-icon { font-size: 22px; }
-  .stat-value { font-size: 24px; font-weight: bold; margin-top: 4px; }
-  .stat-label { font-size: 12px; opacity: 0.6; margin-top: 2px; }
-  .milestone { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .milestone-dot { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
-  .milestone-dot.done { background: #4CAF50; border-color: #4CAF50; }
-  .milestone-dot.goal { background: rgba(255,215,0,0.2); border-color: #FFD700; }
-  .reset-btn { width: 100%; margin-top: 14px; padding: 12px; background: rgba(255,50,50,0.12); border: 1px solid rgba(255,50,50,0.25); border-radius: 12px; color: rgba(255,100,100,0.9); font-size: 14px; }
-
-  .advance-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; font-size: 15px; font-weight: bold; margin-bottom: 10px; transition: all 0.2s; }
-  .advance-ok   { background: #4CAF50; color: #fff; }
-  .advance-warn { background: #FF9800; color: #fff; }
-  .advance-lock { background: rgba(100,100,100,0.3); color: #888; cursor: not-allowed; }
-
-  .info-box { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px; font-size: 13px; opacity: 0.85; line-height: 1.6; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
-
-  .page { padding: 14px 16px 0; display: none; }
-  .page.active { display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: linear-gradient(160deg, #0a1628 0%, #0D7377 50%, #14A0C4 100%); background-attachment: fixed; min-height: 100vh; color: #fff; padding-bottom: 100px; }
+button { cursor: pointer; font-family: inherit; }
+.header { background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.12); position: sticky; top: 0; z-index: 100; }
+.header-sub { font-size: 11px; letter-spacing: 3px; opacity: 0.6; text-transform: uppercase; margin-bottom: 4px; }
+.header-title { font-size: 21px; font-weight: bold; }
+.pbw { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+.pbbg { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; }
+.pbf { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+.pbl { font-size: 12px; opacity: 0.8; white-space: nowrap; }
+.nav { display: flex; gap: 8px; padding: 14px 16px 0; }
+.nav-btn { flex: 1; padding: 9px 4px; border-radius: 10px; border: none; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 13px; transition: all 0.2s; }
+.nav-btn.active { background: rgba(255,255,255,0.95); color: #0D7377; font-weight: bold; }
+.notif { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); color: #fff; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: bold; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: fi 0.2s ease; white-space: nowrap; }
+@keyframes fi { from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+.wsel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.warr { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 10px; font-size: 18px; }
+.warr:disabled { opacity: 0.25; cursor: not-allowed; }
+.wcen { text-align: center; }
+.wtit { font-size: 20px; font-weight: bold; }
+.wpha { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+.sb { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+.sb-ok   { background:rgba(76,175,80,0.2);  border:1px solid rgba(76,175,80,0.5);  color:#81C784; }
+.sb-warn { background:rgba(255,193,7,0.2);  border:1px solid rgba(255,193,7,0.5);  color:#FFD54F; }
+.sb-blk  { background:rgba(244,67,54,0.2);  border:1px solid rgba(244,67,54,0.5);  color:#EF9A9A; }
+.sb-done { background:rgba(76,175,80,0.3);  border:1px solid rgba(76,175,80,0.6);  color:#A5D6A7; }
+.sb-prog { background:rgba(100,100,100,0.2);border:1px solid rgba(150,150,150,0.4);color:#aaa; }
+.sb-fut  { background:rgba(20,160,196,0.15);border:1px solid rgba(20,160,196,0.3); color:#80DEEA; }
+.thrw { margin-top: 10px; }
+.thrl { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.75; margin-bottom: 6px; }
+input[type=range] { width: 100%; accent-color: #14A0C4; }
+.db { width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); border-radius:14px; padding:12px 16px; text-align:left; color:#fff; display:flex; align-items:center; justify-content:space-between; transition:all 0.2s; margin-bottom:2px; }
+.db.exp { border-radius:14px 14px 0 0; background:rgba(255,255,255,0.18); }
+.db.fut { opacity:0.75; }
+.di { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:bold; flex-shrink:0; }
+.di.done { background:#4CAF50; }
+.dinf { margin-left:12px; flex:1; }
+.dnam { font-weight:bold; font-size:15px; }
+.dsub { font-size:12px; opacity:0.65; margin-top:1px; }
+.sp { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14); border-top:none; border-radius:0 0 14px 14px; padding:14px; display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+.sc { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px 14px; display:flex; align-items:flex-start; justify-content:space-between; }
+.sc.done { background:rgba(76,175,80,0.15); border-color:rgba(76,175,80,0.4); }
+.sbadge { font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:4px; }
+.ftag { font-size:10px; padding:2px 8px; border-radius:99px; display:inline-block; margin-left:6px; font-weight:bold; }
+.fp { background:rgba(13,115,119,0.4); color:#80CBC4; border:1px solid rgba(13,115,119,0.6); }
+.fe { background:rgba(100,60,180,0.3); color:#CE93D8; border:1px solid rgba(100,60,180,0.5); }
+.fc { background:rgba(255,140,0,0.25); color:#FFCC80; border:1px solid rgba(255,140,0,0.4); }
+.slbl { font-weight:bold; font-size:15px; margin-bottom:6px; display:block; }
+.sdesc { font-size:13px; opacity:0.8; line-height:1.4; }
+.sdi { padding-left:8px; border-left:2px solid rgba(255,255,255,0.2); margin-bottom:3px; }
+.cb { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; flex-shrink:0; margin-left:10px; display:flex; align-items:center; justify-content:center; }
+.cb.done { background:#4CAF50; border-color:#4CAF50; }
+.cb:disabled { opacity:0.3; cursor:not-allowed; }
+.debt-panel { background:rgba(255,193,7,0.1); border:1px solid rgba(255,193,7,0.3); border-radius:14px; padding:14px 16px; margin-bottom:10px; }
+.debt-t { font-weight:bold; font-size:14px; color:#FFD54F; margin-bottom:10px; }
+.di2 { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.07); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+.di2:last-child { margin-bottom:0; }
+.dc { background:rgba(255,193,7,0.2); border:2px solid rgba(255,193,7,0.5); border-radius:8px; width:36px; height:36px; color:#FFD54F; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dc.done { background:#4CAF50; border-color:#4CAF50; color:#fff; }
+.futb { background:rgba(20,160,196,0.1); border:1px solid rgba(20,160,196,0.3); border-radius:12px; padding:10px 14px; margin-bottom:10px; font-size:13px; color:#80DEEA; text-align:center; }
+.ph { border-radius:12px 12px 0 0; padding:10px 16px; }
+.pb2 { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-top:none; border-radius:0 0 12px 12px; margin-bottom:16px; }
+.wr { padding:12px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.08); cursor:pointer; }
+.wr:last-child { border-bottom:none; }
+.wn { width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:13px; color:rgba(255,255,255,0.7); flex-shrink:0; }
+.wn.done { background:#4CAF50; color:#fff; }
+.wn.warn { background:#FF9800; color:#fff; }
+.wn.cur  { background:#14A0C4; color:#fff; }
+.mbb { height:5px; background:rgba(255,255,255,0.12); border-radius:99px; overflow:hidden; margin-top:4px; }
+.mbf { height:100%; border-radius:99px; transition:width 0.4s; }
+.sgr { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.sc2 { background:rgba(255,255,255,0.09); border-radius:14px; padding:14px 16px; border:1px solid rgba(255,255,255,0.12); }
+.ms { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.md { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+.md.done { background:#4CAF50; border-color:#4CAF50; }
+.md.goal { background:rgba(255,215,0,0.2); border-color:#FFD700; }
+.rb { width:100%; margin-top:14px; padding:12px; background:rgba(255,50,50,0.12); border:1px solid rgba(255,50,50,0.25); border-radius:12px; color:rgba(255,100,100,0.9); font-size:14px; }
+.ab { width:100%; padding:14px; border-radius:14px; border:none; font-size:15px; font-weight:bold; margin-bottom:10px; }
+.ab-ok  { background:#4CAF50; color:#fff; }
+.ab-w   { background:#FF9800; color:#fff; }
+.ab-lk  { background:rgba(100,100,100,0.3); color:#888; cursor:not-allowed; }
+.ib { background:rgba(255,255,255,0.07); border-radius:12px; padding:12px 14px; font-size:13px; opacity:0.85; line-height:1.6; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1); }
+.page { padding:14px 16px 0; display:none; }
+.page.active { display:block; }
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="header-sub">Plano 12 Semanas — Elástico</div>
-  <div class="header-title">🏊 Natação + 💪 Calistenia</div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="globalBar" style="width:0%;background:#4CAF50"></div>
-    </div>
-    <span class="progress-label" id="globalLabel">Semana 1 de 12</span>
-  </div>
+  <div class="header-sub">Plano 12 Semanas</div>
+  <div class="header-title">Natacao + Calistenia</div>
+  <div class="pbw"><div class="pbbg"><div class="pbf" id="gBar" style="width:0%;background:#4CAF50"></div></div><span class="pbl" id="gLbl">Semana 1 de 12</span></div>
 </div>
-
 <div class="notif" id="notif" style="display:none"></div>
-
 <div class="nav">
-  <button class="nav-btn active" onclick="showView('week')">Semana</button>
-  <button class="nav-btn" onclick="showView('overview')">Visão Geral</button>
-  <button class="nav-btn" onclick="showView('progress')">Progresso</button>
+  <button class="nav-btn active" onclick="sv('week')">Semana</button>
+  <button class="nav-btn" onclick="sv('overview')">Visao Geral</button>
+  <button class="nav-btn" onclick="sv('progress')">Progresso</button>
 </div>
 
 <div class="page active" id="view-week">
   <div class="card" style="margin-top:14px">
-    <div class="week-selector">
-      <button class="week-arrow" id="btnPrev" onclick="changeWeek(-1)">‹</button>
-      <div class="week-center">
-        <div class="week-title" id="weekTitle">Semana 1</div>
-        <div class="week-phase" id="weekPhase"></div>
-      </div>
-      <button class="week-arrow" id="btnNext" onclick="changeWeek(1)">›</button>
+    <div class="wsel">
+      <button class="warr" id="bPrev" onclick="cw(-1)">&#8249;</button>
+      <div class="wcen"><div class="wtit" id="wTit">Semana 1</div><div class="wpha" id="wPha"></div></div>
+      <button class="warr" id="bNext" onclick="cw(1)">&#8250;</button>
     </div>
-    <div id="weekStatusBadge"></div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="weekBar" style="width:0%"></div>
-      </div>
-      <span class="progress-label" id="weekLabel">0/0</span>
-    </div>
-    <div class="threshold-wrap">
-      <div class="threshold-label">
-        <span>Meta mínima: <strong id="thresholdVal">70%</strong></span>
-        <span id="thresholdNeeded"></span>
-      </div>
-      <input type="range" id="thresholdSlider" min="50" max="100" step="5" value="70" oninput="updateThreshold(this.value)">
+    <div id="wBadge"></div>
+    <div class="pbw"><div class="pbbg"><div class="pbf" id="wBar" style="width:0%"></div></div><span class="pbl" id="wLbl">0/0</span></div>
+    <div class="thrw">
+      <div class="thrl"><span>Meta minima: <strong id="thrV">70%</strong></span><span id="thrN"></span></div>
+      <input type="range" id="thrS" min="50" max="100" step="5" value="70" oninput="uthr(this.value)">
     </div>
   </div>
-  <div id="debtPanel"></div>
-  <div id="advancePanel"></div>
-  <div id="dayList"></div>
+  <div id="debtP"></div>
+  <div id="advP"></div>
+  <div id="futB"></div>
+  <div id="dayL"></div>
 </div>
 
 <div class="page" id="view-overview">
-  <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin:14px 0 12px">12 Semanas — Plano Elástico</div>
-  <div class="info-box">📅 O plano avança conforme você conclui cada semana — sem datas fixas. Faltou? Compensa e segue em frente!</div>
-  <div id="overviewList"></div>
+  <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin:14px 0 12px">12 Semanas - Plano Elastico</div>
+  <div class="ib">Plano sem datas fixas - avanca conforme voce conclui. Faltou? Compensa e segue! Use as setas para visualizar semanas futuras e se preparar.</div>
+  <div id="ovL"></div>
 </div>
 
 <div class="page" id="view-progress">
-  <div class="stats-grid" style="margin-top:14px" id="statsGrid"></div>
+  <div class="sgr" style="margin-top:14px" id="stG"></div>
   <div class="card" style="margin-bottom:14px">
-    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-      <span style="font-weight:bold">Progresso Geral</span>
-      <span style="opacity:0.7;font-size:14px" id="progressTotal"></span>
-    </div>
-    <div class="progress-bar-bg" style="height:12px">
-      <div class="progress-bar-fill" id="progressBar" style="width:0%;background:linear-gradient(90deg,#0D7377,#14A0C4,#4CAF50)"></div>
-    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-weight:bold">Progresso Geral</span><span style="opacity:0.7;font-size:14px" id="pTot"></span></div>
+    <div class="pbbg" style="height:12px"><div class="pbf" id="pBar" style="width:0%;background:linear-gradient(90deg,#0D7377,#14A0C4,#4CAF50)"></div></div>
   </div>
-  <div class="card">
-    <div style="font-weight:bold;margin-bottom:14px">🏆 Marcos da Jornada</div>
-    <div id="milestones"></div>
-  </div>
-  <button class="reset-btn" onclick="resetProgress()">🗑 Resetar progresso</button>
+  <div class="card"><div style="font-weight:bold;margin-bottom:14px">Marcos da Jornada</div><div id="mils"></div></div>
+  <button class="rb" onclick="rst()">Resetar progresso</button>
 </div>
 
 <script>
-const NATACAO={1:"5×2min | +1min pausa | Foco: braçada consistente",2:"5×2min | +1min pausa | Varie crawl/costas",3:"5×2min | +1min pausa | Aumente o ritmo",4:"6×2,5min | +45s pausa | 2 costas + 4 crawl",5:"6×2,5min | +45s pausa | Aumente cadência",6:"6×2,5min | +45s pausa | Foco na técnica",7:"5×4min | +1min pausa | +1 sprint 30s ao final",8:"5×4min | +1min pausa | +1 sprint 30s",9:"4×5min | +1min pausa | +2 sprints ao final",10:"4×5min | +1min pausa | +2 sprints",11:"4×5min | +1min pausa | Técnica + resistência",12:"4×5min | +1min pausa | Sessão de performance total"};
-const CALISTENIA={1:["Dead hang 3×20s","Scapular pull 3×8","Flexão joelho 3×10","Prancha 3×30s","Knee raise 3×8"],2:["Dead hang 3×25s","Scapular pull 3×8","Flexão joelho 3×12","Prancha 3×35s","Knee raise 3×10"],3:["Dead hang 3×30s","Scapular pull 3×10","Flexão 3×10","Prancha 3×40s","Knee raise 3×12"],4:["Dead hang 3×35s","Scapular pull 3×10","Flexão 3×12","Prancha larga 2×8","Knee raise 3×12"],5:["Scapular pull 3×10","Negativa barra 4×3 (5s)","Flexão 4×10","Prancha lateral 3×25s","Knee raise 3×12"],6:["Scapular pull 3×10","Negativa barra 4×4 (5s)","Flexão 4×12","Prancha lateral 3×30s","Knee raise 3×15"],7:["Scapular pull 3×10","Negativa barra 4×5 (5s)","Flexão elevada 2×8","Prancha 3×45s","Knee raise 3×15"],8:["Scapular pull 3×10","Negativa barra 4×5 (6s)","Flexão elevada 3×8","Prancha 3×45s","L-sit 3×15s"],9:["Negativa 4×5 (7s)","Barra c/ elástico 4×3","Scapular pull 2×10","Dead hang máximo","Knee raise 3×15"],10:["Negativa 4×5 (7s)","Barra c/ elástico 4×4","Flexão elevada 4×10","Prancha 3×45s","Dragon flag 3×3"],11:["Negativa 4×5 (8s)","Barra c/ elástico 4×5","Flexão diamante 3×8","Prancha 3×50s","Dragon flag 3×3"],12:["Negativa 4×5 (8s)","BARRA COMPLETA — tente!","Flexão diamante 3×10","Prancha 3×60s","Dragon flag 3×5"]};
-const PHASES=[{name:"FASE 1",label:"Adaptação",weeks:[1,2,3,4],color:"#0D7377"},{name:"FASE 2",label:"Construção",weeks:[5,6,7,8],color:"#14A0C4"},{name:"FASE 3",label:"Performance",weeks:[9,10,11,12],color:"#1B2A4A"}];
-const DAY_NAMES=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
+const NAT={1:"5x2min | +1min pausa | Bracao e respiracao",2:"5x2min | +1min pausa | Alterne crawl e costas",3:"5x2min | +1min pausa | Ritmo constante",4:"6x2.5min | +45s pausa | 2 costas + 4 crawl",5:"6x2.5min | +45s pausa | Cadencia de bracada",6:"6x2.5min | +45s pausa | Tecnica de virada",7:"5x4min | +1min pausa | +1 sprint 30s ao final",8:"5x4min | +1min pausa | +2 sprints 20s ao final",9:"4x5min | +1min pausa | +2 sprints 30s ao final",10:"4x5min | +1min pausa | Resistencia maxima",11:"4x5min | +1min pausa | Simulacao de prova",12:"4x5min | +1min pausa | Sessao de performance total"};
 
-function getWeekSessions(w){return[{day:0,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},{day:0,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},{day:1,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},{day:1,period:"noite",type:"rest",label:"😴 Recuperação",desc:["Alongamento e mobilidade 15 min"]},{day:2,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},{day:2,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},{day:3,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},{day:3,period:"noite",type:"rest",label:"😴 Recuperação",desc:["Alongamento e mobilidade 15 min"]},{day:4,period:"manhã",type:"swim",label:"🏊 Natação",desc:[NATACAO[w]]},{day:4,period:"noite",type:"cali",label:"💪 Calistenia",desc:CALISTENIA[w]},{day:5,period:"dia",type:"off",label:"🏖 Descanso ativo",desc:["Caminhada ou mobilidade leve"]},{day:6,period:"dia",type:"off",label:"🏖 Descanso total",desc:["Recuperação completa"]}];}
-function getPhase(w){return PHASES.find(p=>p.weeks.includes(w))||PHASES[0];}
-function sessionKey(w,d,p){return`w${w}_d${d}_${p}`;}
-function debtKey(w,d,p){return`debt_w${w}_d${d}_${p}`;}
-function getCheckable(w){return getWeekSessions(w).filter(s=>s.type!=="off");}
-function getProgress(w){const s=getCheckable(w);const done=s.filter(s=>checks[sessionKey(w,s.day,s.period)]).length;return{done,total:s.length,pct:s.length?Math.round((done/s.length)*100):0};}
+const CA={
+1:[[{f:"PUXAR",i:["Dead hang 3x20s","Scapular pull 3x10","Remada invertida 3x8","Flexao supinada 3x8"]},{f:"EMPURRAR+CORE",i:["Flexao joelho 4x10","Flexao larga 3x8","Prancha frontal 3x30s","Prancha lateral 2x20s cada","Abdominal bicicleta 3x15"]},{f:"CIRCUITO",i:["3 rodadas: Dead hang 20s / Flexao 8 / Knee raise 8 / Prancha 20s","Descanso 90s entre rodadas","Foco: nao parar dentro da rodada"]}]],
+2:[[{f:"PUXAR",i:["Dead hang 3x25s","Scapular pull 3x12","Remada invertida 3x10","Flexao supinada 3x10"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x10","Flexao diamante 3x8","Prancha frontal 3x35s","Prancha lateral 2x25s cada","Abdominal bicicleta 3x20"]},{f:"CIRCUITO",i:["3 rodadas: Dead hang 25s / Flexao 10 / Knee raise 10 / Prancha 25s","Descanso 75s entre rodadas","Mantenha a qualidade ate a ultima rodada"]}]],
+3:[[{f:"PUXAR",i:["Dead hang 3x30s","Scapular pull 3x12","Remada invertida 3x12","Flexao supinada 4x8"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x12","Flexao pes elevados 3x8","Prancha frontal 3x40s","Prancha lateral 2x30s cada","L-sit tentativa 3x10s"]},{f:"CIRCUITO",i:["4 rodadas: Dead hang 25s / Flexao 10 / Knee raise 12 / Prancha 30s","Descanso 60s entre rodadas","Esta ficando mais facil?"]}]],
+4:[[{f:"PUXAR",i:["Dead hang 3x35s","Scapular pull 3x15","Remada invertida 4x10","Flexao supinada 4x10"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x15","Flexao pes elevados 3x10","Prancha frontal 3x45s","Prancha lateral 2x35s cada","L-sit 3x12s"]},{f:"CIRCUITO",i:["4 rodadas: Dead hang 30s / Flexao 12 / Knee raise 12 / Prancha 35s","Descanso 60s entre rodadas","Fase 1 concluida - teste seu max de dead hang!"]}]],
+5:[[{f:"PUXAR",i:["Scapular pull 4x12","NEGATIVA BARRA 4x3 (5s de descida)","Remada invertida 4x10","Dead hang 2x30s"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x15","Flexao pes elevados 4x10","Prancha frontal 3x45s","Prancha lateral 3x30s cada","Dragon flag excentrico 3x3"]},{f:"CIRCUITO",i:["4 rodadas: Negativa barra 2 reps / Flexao 12 / Knee raise 15 / Prancha 40s","Descanso 60s entre rodadas","A negativa e a chave - foco na descida lenta"]}]],
+6:[[{f:"PUXAR",i:["Scapular pull 4x12","NEGATIVA BARRA 4x4 (5s de descida)","Remada invertida 4x12","Dead hang 2x35s"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x12","Flexao diamante 3x10","Prancha frontal 3x50s","Prancha lateral 3x35s cada","Dragon flag excentrico 3x4"]},{f:"CIRCUITO",i:["4 rodadas: Negativa 3 reps / Flexao elevada 10 / Knee raise 15 / Prancha 40s","Descanso 55s entre rodadas"]}]],
+7:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (5s de descida)","Remada invertida 4x12","Dead hang 2x40s - bata seu recorde!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x12","Flexao diamante 3x12","Prancha frontal 3x50s","L-sit 3x15s","Dragon flag excentrico 3x4"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 3 reps / Flexao elevada 12 / Knee raise 15 / Prancha 45s","Descanso 50s entre rodadas"]}]],
+8:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (6s de descida)","Barra com elastico 3x2 (se disponivel)","Dead hang maximo - registre o tempo!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x15","Flexao diamante 4x10","Prancha frontal 3x55s","L-sit 3x18s","Dragon flag excentrico 3x5"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 4 reps / Flexao elevada 12 / Knee raise 18 / Prancha 50s","Descanso 45s entre rodadas","Fase 2 concluida - voce esta perto da barra!"]}]],
+9:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (7s de descida)","Barra com elastico 4x3","Dead hang maximo"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x15","Flexao diamante 4x12","Prancha frontal 3x60s","L-sit 3x20s","Dragon flag 3x3 (completo)"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 4 reps (7s) / Flexao elevada 12 / Knee raise 20 / Prancha 50s","Descanso 40s entre rodadas"]}]],
+10:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (7s de descida)","Barra com elastico 4x4","Dead hang maximo - bata seu recorde!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x12","Prancha frontal 4x60s","L-sit 3x22s","Dragon flag 3x4"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 5 reps (7s) / Flexao elevada 15 / Knee raise 20 / Prancha 55s","Descanso 35s entre rodadas"]}]],
+11:[[{f:"PUXAR",i:["Negativa barra 4x5 (8s de descida)","Barra com elastico 4x5","Scapular pull 3x15","Tente 1 BARRA COMPLETA sem elastico - sem pressao!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x15","Prancha frontal 4x60s","Dragon flag 3x4","L-sit 3x25s"]},{f:"CIRCUITO",i:["6 rodadas: Negativa 5 reps (8s) / Flexao elevada 15 / Knee raise 20 / Prancha 60s","Descanso 30s entre rodadas","Ultima semana antes da performance!"]}]],
+12:[[{f:"PUXAR",i:["Negativa barra 4x5 (8s de descida)","BARRA COMPLETA - max de repeticoes!","Scapular pull 3x15 (warm-down)","Dead hang final - registre seu tempo maximo"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x15","Prancha frontal 4x60s","Dragon flag 3x5","L-sit 3x30s"]},{f:"CIRCUITO FINAL",i:["6 rodadas: Barra/Negativa / Flexao elevada 15 / Knee raise 20 / Prancha 60s","Descanso 30s entre rodadas","Voce chegou ate aqui - celebre cada repeticao!"]}]]
+};
 
-let currentWeek=1,expandedDay=null,threshold=70,checks={},debtChecks={},unlockedUpTo=1;
+const PHS=[{n:"FASE 1",l:"Adaptacao",w:[1,2,3,4],c:"#0D7377"},{n:"FASE 2",l:"Construcao",w:[5,6,7,8],c:"#14A0C4"},{n:"FASE 3",l:"Performance",w:[9,10,11,12],c:"#1B2A4A"}];
+const DN=["Segunda","Terca","Quarta","Quinta","Sexta","Sabado","Domingo"];
 
-function loadState(){try{const s=JSON.parse(localStorage.getItem("treino_v2")||"{}");checks=s.checks||{};debtChecks=s.debtChecks||{};threshold=s.threshold||70;unlockedUpTo=s.unlockedUpTo||1;currentWeek=s.currentWeek||1;}catch{}}
-function saveState(){try{localStorage.setItem("treino_v2",JSON.stringify({checks,debtChecks,threshold,unlockedUpTo,currentWeek}));}catch{}}
-loadState();
+function gws(w){const c=CA[w][0];return[
+{day:0,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
+{day:0,per:"noite",type:"cali",lbl:"Calistenia",foc:c[0].f,dsc:c[0].i},
+{day:1,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
+{day:1,per:"noite",type:"rest",lbl:"Recuperacao",foc:"",dsc:["Alongamento 10min + mobilidade ombros e quadril"]},
+{day:2,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
+{day:2,per:"noite",type:"cali",lbl:"Calistenia",foc:c[1].f,dsc:c[1].i},
+{day:3,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
+{day:3,per:"noite",type:"rest",lbl:"Recuperacao",foc:"",dsc:["Alongamento 10min + mobilidade ombros e quadril"]},
+{day:4,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
+{day:4,per:"noite",type:"cali",lbl:"Calistenia",foc:c[2].f,dsc:c[2].i},
+{day:5,per:"dia",type:"off",lbl:"Descanso ativo",foc:"",dsc:["Caminhada leve ou mobilidade - sem carga"]},
+{day:6,per:"dia",type:"off",lbl:"Descanso total",foc:"",dsc:["Recuperacao completa - o musculo cresce aqui!"]},
+];}
 
-function weekStatus(w){if(w>unlockedUpTo)return'locked';const{pct}=getProgress(w);if(w<unlockedUpTo)return'completed';if(pct>=threshold)return'ok';if(pct>=50)return'warn';if(pct>0)return'block';return'inprogress';}
-function canView(w){return w<=unlockedUpTo;}
+function gph(w){return PHS.find(p=>p.w.includes(w))||PHS[0];}
+function sk(w,d,p){return`w${w}_d${d}_${p}`;}
+function dk(w,d,p){return`dbt_w${w}_d${d}_${p}`;}
+function gck(w){return gws(w).filter(s=>s.type!=="off");}
+function gpr(w){const s=gck(w);const dn=s.filter(s=>ch[sk(w,s.day,s.per)]).length;return{done:dn,total:s.length,pct:s.length?Math.round((dn/s.length)*100):0};}
 
-function showView(v){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));document.getElementById("view-"+v).classList.add("active");const map={week:0,overview:1,progress:2};document.querySelectorAll(".nav-btn")[map[v]].classList.add("active");if(v==="week")renderWeek();if(v==="overview")renderOverview();if(v==="progress")renderProgress();}
+let cw2=1,exD=null,thr=70,ch={},dch={},unl=1;
+function ls(){try{const s=JSON.parse(localStorage.getItem("tv4")||"{}");ch=s.ch||{};dch=s.dch||{};thr=s.thr||70;unl=s.unl||1;cw2=s.cw2||1;}catch{}}
+function ss(){try{localStorage.setItem("tv4",JSON.stringify({ch,dch,thr,unl,cw2}));}catch{}}
+ls();
 
-function changeWeek(d){const nw=currentWeek+d;if(nw<1||nw>12)return;if(nw>unlockedUpTo){showNotif("🔒 Complete a semana atual primeiro!","#E53935");return;}currentWeek=nw;expandedDay=null;saveState();renderWeek();}
+function wst(w){const{pct}=gpr(w);if(w>unl)return'fut';if(w<unl)return'done';if(pct>=100)return'perf';if(pct>=thr)return'ok';if(pct>=50)return'warn';if(pct>0)return'blk';return'prog';}
+function isF(w){return w>unl;}
 
-function updateThreshold(v){threshold=parseInt(v);document.getElementById("thresholdVal").textContent=threshold+"%";saveState();renderWeek();}
+function sv(v){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));document.getElementById("view-"+v).classList.add("active");[{k:"week",i:0},{k:"overview",i:1},{k:"progress",i:2}].forEach(x=>{if(x.k===v)document.querySelectorAll(".nav-btn")[x.i].classList.add("active");});if(v==="week")rw();if(v==="overview")ro();if(v==="progress")rp();}
 
-function advanceWeek(){const{pct,total}=getProgress(currentWeek);if(pct<50){showNotif("🔒 Complete pelo menos 50% para avançar!","#E53935");return;}
-  if(pct<threshold){if(!confirm(`Avançar com ${total-Math.round(total*pct/100)} treino(s) em débito? Eles aparecerão para compensação.`))return;}
-  const missed=getCheckable(currentWeek).filter(s=>!checks[sessionKey(currentWeek,s.day,s.period)]);
-  missed.forEach(s=>{const k=debtKey(currentWeek,s.day,s.period);debtChecks[k]=false;});
-  if(currentWeek<12){unlockedUpTo=Math.max(unlockedUpTo,currentWeek+1);currentWeek++;expandedDay=null;saveState();showNotif("🎉 Semana "+(currentWeek-1)+" concluída! Avançando...","#4CAF50");setTimeout(()=>renderWeek(),300);}
-  else{showNotif("🏆 Plano completo! Você conseguiu!","#FFD700");}}
+function cw(d){const n=cw2+d;if(n<1||n>12)return;cw2=n;exD=null;ss();rw();}
+function uthr(v){thr=parseInt(v);document.getElementById("thrV").textContent=thr+"%";ss();rw();}
 
-function toggleDebt(w,d,p){const k=debtKey(w,d,p);debtChecks[k]=!debtChecks[k];saveState();renderWeek();if(debtChecks[k])showNotif("✅ Débito compensado!","#4CAF50");}
+function adv(){const{pct,total,done}=gpr(cw2);if(pct<50){sn("Complete pelo menos 50% para avancar!","#E53935");return;}
+if(pct<thr){if(!confirm("Avancar com "+(total-done)+" treino(s) em debito?\nEles aparecerao para compensacao."))return;}
+const ms=gck(cw2).filter(s=>!ch[sk(cw2,s.day,s.per)]);
+ms.forEach(s=>{const k=dk(cw2,s.day,s.per);if(!(k in dch))dch[k]=false;});
+if(cw2<12){unl=Math.max(unl,cw2+1);cw2++;exD=null;ss();sn("Semana "+(cw2-1)+" concluida! Avancando...","#4CAF50");setTimeout(()=>rw(),300);}
+else{sn("Plano completo! Incrivel!","#FFD700");}}
 
-function renderWeek(){
-  const phase=getPhase(currentWeek);
-  const{done,total,pct}=getProgress(currentWeek);
-  const needed=Math.ceil(total*threshold/100);
-  const status=weekStatus(currentWeek);
+function tgd(w,d,p){const k=dk(w,d,p);dch[k]=!dch[k];ss();rw();if(dch[k])sn("Debito compensado!","#4CAF50");}
 
-  document.getElementById("weekTitle").textContent=`Semana ${currentWeek}`;
-  document.getElementById("weekPhase").textContent=`${phase.name} — ${phase.label}`;
-  document.getElementById("weekPhase").style.color=phase.color==="#1B2A4A"?"#14A0C4":phase.color;
-  document.getElementById("thresholdSlider").value=threshold;
-  document.getElementById("thresholdVal").textContent=threshold+"%";
-  const falta=Math.max(0,needed-done);
-  document.getElementById("thresholdNeeded").textContent=falta>0?`Faltam ${falta} treino${falta>1?"s":""}`:done===total?"Perfeito! 🎉":"Meta atingida ✅";
+function rw(){
+const ph=gph(cw2);const{done,total,pct}=gpr(cw2);const nd=Math.ceil(total*thr/100);const st=wst(cw2);const fut=isF(cw2);
+document.getElementById("wTit").textContent="Semana "+cw2;
+document.getElementById("wPha").textContent=ph.n+" - "+ph.l;
+document.getElementById("wPha").style.color=ph.c==="#1B2A4A"?"#14A0C4":ph.c;
+document.getElementById("thrS").value=thr;
+document.getElementById("thrV").textContent=thr+"%";
+const flt=Math.max(0,nd-done);
+document.getElementById("thrN").textContent=fut?"(visualizacao)":(flt>0?"Faltam "+flt+" treino"+(flt>1?"s":""):(done===total?"Perfeito!":"Meta atingida"));
+let bc=fut?"rgba(20,160,196,0.3)":pct>=thr?"#4CAF50":pct>=50?"#FF9800":pct>0?"#E53935":"rgba(255,255,255,0.2)";
+document.getElementById("wBar").style.width=(fut?100:pct)+"%";
+document.getElementById("wBar").style.background=bc;
+document.getElementById("wLbl").textContent=fut?"Previa":done+"/"+total+" ("+pct+"%)";
+let bh="";
+if(fut)bh=`<span class="sb sb-fut">Visualizacao - semana futura</span>`;
+else if(st==="done"||st==="perf")bh=`<span class="sb sb-done">Semana concluida</span>`;
+else if(pct>=thr)bh=`<span class="sb sb-ok">Meta atingida - pode avancar!</span>`;
+else if(pct>=50)bh=`<span class="sb sb-warn">Abaixo da meta - avance com debito</span>`;
+else if(done>0)bh=`<span class="sb sb-blk">Complete mais treinos para avancar</span>`;
+else bh=`<span class="sb sb-prog">Em andamento</span>`;
+document.getElementById("wBadge").innerHTML=bh;
+document.getElementById("bPrev").disabled=cw2<=1;
+document.getElementById("bNext").disabled=cw2>=12;
+ug();
 
-  let barColor=pct>=threshold?"#4CAF50":pct>=50?"#FF9800":pct>0?"#E53935":"#14A0C4";
-  document.getElementById("weekBar").style.width=pct+"%";
-  document.getElementById("weekBar").style.background=barColor;
-  document.getElementById("weekLabel").textContent=`${done}/${total} (${pct}%)`;
+document.getElementById("futB").innerHTML=fut?`<div class="futb">Voce esta visualizando uma semana futura. Os treinos nao podem ser marcados ainda.</div>`:"";
 
-  let badgeHtml="";
-  if(status==="completed")badgeHtml=`<span class="status-badge status-done">✅ Semana já concluída</span>`;
-  else if(pct>=100)badgeHtml=`<span class="status-badge status-ok">🏆 Semana perfeita! Avance!</span>`;
-  else if(pct>=threshold)badgeHtml=`<span class="status-badge status-ok">✅ Meta atingida — pode avançar!</span>`;
-  else if(pct>=50)badgeHtml=`<span class="status-badge status-warn">⚠️ Abaixo da meta — avance com débito</span>`;
-  else if(done>0)badgeHtml=`<span class="status-badge status-block">🔴 Complete mais treinos para avançar</span>`;
-  else badgeHtml=`<span class="status-badge status-lock">📋 Semana em andamento</span>`;
-  document.getElementById("weekStatusBadge").innerHTML=badgeHtml;
+const pd=[];
+for(const k in dch){if(dch[k]===false){const m=k.match(/dbt_w(\d+)_d(\d+)_(.+)/);if(m){const dw=parseInt(m[1]),dd=parseInt(m[2]),dp=m[3];const ses=gws(dw).find(s=>s.day===dd&&s.per===dp);if(ses)pd.push({k,w:dw,d:dd,p:dp,ses});}}}
+let dh="";
+if(!fut&&pd.length>0){
+  dh=`<div class="debt-panel"><div class="debt-t">Treinos em debito (${pd.length}) - compense quando puder</div>`;
+  for(const{w,d,p,ses}of pd){const paid=dch[dk(w,d,p)];dh+=`<div class="di2"><div><div style="font-size:13px;font-weight:bold">${ses.lbl}${ses.foc?" - "+ses.foc:""}</div><div style="font-size:11px;opacity:0.6">Semana ${w} - ${DN[d]}</div></div><button class="dc${paid?" done":""}" onclick="tgd(${w},${d},'${p}')">${paid?"v":"+"}</button></div>`;}
+  dh+=`</div>`;
+}
+document.getElementById("debtP").innerHTML=dh;
 
-  document.getElementById("btnPrev").disabled=currentWeek<=1;
-  document.getElementById("btnNext").disabled=currentWeek>=unlockedUpTo;
-  updateGlobal();
+let ah="";
+if(!fut&&st!=="done"&&st!=="perf"){
+  if(pct>=thr)ah=`<button class="ab ab-ok" onclick="adv()">Concluir Semana ${cw2} e Avancar</button>`;
+  else if(pct>=50)ah=`<button class="ab ab-w" onclick="adv()">Avancar com debito (${total-done} pendente${total-done>1?"s":""})</button>`;
+  else ah=`<button class="ab ab-lk" disabled>Complete pelo menos 50% para avancar</button>`;
+}else if(!fut){ah=`<div style="text-align:center;opacity:0.6;font-size:13px;margin-bottom:10px">Semana concluida - use as setas para navegar</div>`;}
+document.getElementById("advP").innerHTML=ah;
 
-  // DEBTS
-  const pendingDebts=[];
-  for(const k in debtChecks){if(debtChecks[k]===false){const m=k.match(/debt_w(\d+)_d(\d+)_(.+)/);if(m){const dw=parseInt(m[1]),dd=parseInt(m[2]),dp=m[3];const sess=getWeekSessions(dw).find(s=>s.day===dd&&s.period===dp);if(sess)pendingDebts.push({k,w:dw,d:dd,p:dp,sess});}}}
-  let debtHtml="";
-  if(pendingDebts.length>0){
-    debtHtml=`<div class="debt-panel"><div class="debt-title">⚠️ Treinos em débito (${pendingDebts.length})</div>`;
-    for(const{w,d,p,sess}of pendingDebts){debtHtml+=`<div class="debt-item"><div><div style="font-size:13px;font-weight:bold">${sess.label}</div><div style="font-size:11px;opacity:0.6">Semana ${w} — ${DAY_NAMES[d]}</div></div><button class="debt-check" onclick="toggleDebt(${w},${d},'${p}')">✓</button></div>`;}
-    debtHtml+=`</div>`;
-  }
-  document.getElementById("debtPanel").innerHTML=debtHtml;
-
-  // ADVANCE
-  let advHtml="";
-  if(status!=="completed"){
-    if(pct>=threshold)advHtml=`<button class="advance-btn advance-ok" onclick="advanceWeek()">✅ Concluir Semana ${currentWeek} e Avançar →</button>`;
-    else if(pct>=50)advHtml=`<button class="advance-btn advance-warn" onclick="advanceWeek()">⚠️ Avançar com débito (${total-done} pendente${total-done>1?"s":""})</button>`;
-    else advHtml=`<button class="advance-btn advance-lock" disabled>🔒 Complete pelo menos 50% para avançar</button>`;
-  }else{advHtml=`<div style="text-align:center;opacity:0.6;font-size:13px;margin-bottom:10px">✅ Semana já concluída — use as setas para navegar</div>`;}
-  document.getElementById("advancePanel").innerHTML=advHtml;
-
-  // DAYS
-  const sessions=getWeekSessions(currentWeek);
-  let html="";
-  for(let di=0;di<7;di++){
-    const ds=sessions.filter(s=>s.day===di);
-    const isExp=expandedDay===di;
-    const dDone=ds.filter(s=>s.type!=="off"&&checks[sessionKey(currentWeek,s.day,s.period)]).length;
-    const dTotal=ds.filter(s=>s.type!=="off").length;
-    const allOff=ds.every(s=>s.type==="off");
-    const allDone=dTotal>0&&dDone===dTotal;
-    html+=`<button class="day-btn${isExp?" expanded":""}" onclick="toggleDay(${di})"><div style="display:flex;align-items:center;flex:1"><div class="day-icon${allDone?" done":""}">${allOff?"🏖":(allDone?"✅":DAY_NAMES[di].substring(0,3))}</div><div class="day-info"><div class="day-name">${DAY_NAMES[di]}</div><div class="day-sub">${allOff?"Descanso":ds.map(s=>s.label).join(" • ")}</div></div></div><div class="day-right">${!allOff?`<span style="font-size:12px;opacity:0.7">${dDone}/${dTotal}</span>`:""}<span style="opacity:0.4;font-size:16px">${isExp?"▲":"▼"}</span></div></button>`;
-    if(isExp){
-      html+=`<div class="session-panel">`;
-      for(const sess of ds){
-        const key=sessionKey(currentWeek,sess.day,sess.period);
-        const isDone=checks[key];
-        const isOff=sess.type==="off"||sess.type==="rest";
-        const tc={swim:"#14A0C4",cali:"#0D7377",rest:"#6B8CAE",off:"#B0C4DE"};
-        const c=tc[sess.type]||"#888";
-        html+=`<div class="session-card${isDone?" done":""}"><div class="session-content"><span class="session-badge" style="background:${c}33;color:${c};border:1px solid ${c}55">${sess.period}</span><span class="session-label">${sess.label}</span><div>`;
-        if(sess.desc.length>1){for(const d of sess.desc)html+=`<div class="session-desc session-desc-item">${d}</div>`;}
-        else html+=`<div class="session-desc">${sess.desc[0]}</div>`;
-        html+=`</div></div>`;
-        if(!isOff)html+=`<button class="check-btn${isDone?" done":""}" onclick="toggleCheck(${currentWeek},${sess.day},'${sess.period}')">${isDone?"✓":""}</button>`;
-        html+=`</div>`;
-      }
+const ses=gws(cw2);let html="";
+for(let di=0;di<7;di++){
+  const ds=ses.filter(s=>s.day===di);const isE=exD===di;
+  const ddn=ds.filter(s=>s.type!=="off"&&ch[sk(cw2,s.day,s.per)]).length;
+  const dtot=ds.filter(s=>s.type!=="off").length;
+  const aoff=ds.every(s=>s.type==="off");const adone=!fut&&dtot>0&&ddn===dtot;
+  html+=`<button class="db${isE?" exp":""}${fut?" fut":""}" onclick="td(${di})">
+    <div style="display:flex;align-items:center;flex:1">
+      <div class="di${adone?" done":""}">${aoff?"&#127958;":(adone?"&#9989;":DN[di].substring(0,3))}</div>
+      <div class="dinf"><div class="dnam">${DN[di]}</div>
+      <div class="dsub">${aoff?"Descanso":ds.map(s=>s.lbl+(s.foc?" ("+s.foc+")":"")).join(" | ")}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">${!aoff&&!fut?`<span style="font-size:12px;opacity:0.7">${ddn}/${dtot}</span>`:""}<span style="opacity:0.4;font-size:16px">${isE?"&#9650;":"&#9660;"}</span></div>
+  </button>`;
+  if(isE){
+    html+=`<div class="sp">`;
+    for(const s of ds){
+      const key=sk(cw2,s.day,s.per);const isd=!fut&&ch[key];const isO=s.type==="off"||s.type==="rest";
+      const tc={swim:"#14A0C4",cali:"#0D7377",rest:"#6B8CAE",off:"#B0C4DE"};const c=tc[s.type]||"#888";
+      const fc=s.foc==="PUXAR"?"fp":s.foc.includes("EMPURRAR")?"fe":s.foc.includes("CIRCUITO")?"fc":"";
+      html+=`<div class="sc${isd?" done":""}"><div style="flex:1">
+        <span class="sbadge" style="background:${c}33;color:${c};border:1px solid ${c}55">${s.per}</span>
+        ${s.foc?`<span class="ftag ${fc}">${s.foc}</span>`:""}
+        <span class="slbl">${s.lbl}</span><div>`;
+      if(s.dsc.length>1){for(const x of s.dsc)html+=`<div class="sdesc sdi">${x}</div>`;}
+      else html+=`<div class="sdesc">${s.dsc[0]}</div>`;
+      html+=`</div></div>`;
+      if(!isO)html+=`<button class="cb${isd?" done":""}" ${fut?"disabled":""} onclick="${fut?"":"tc2("+cw2+","+s.day+",'"+s.per+"')"}">${isd?"v":""}</button>`;
       html+=`</div>`;
     }
+    html+=`</div>`;
   }
-  document.getElementById("dayList").innerHTML=html;
+}
+document.getElementById("dayL").innerHTML=html;
 }
 
-function toggleDay(d){expandedDay=expandedDay===d?null:d;renderWeek();}
-function toggleCheck(w,d,p){const key=sessionKey(w,d,p);checks[key]=!checks[key];saveState();if(checks[key])showNotif("✅ Treino marcado!","#4CAF50");renderWeek();}
+function td(d){exD=exD===d?null:d;rw();}
+function tc2(w,d,p){if(isF(w))return;const k=sk(w,d,p);ch[k]=!ch[k];ss();if(ch[k])sn("Treino marcado!","#4CAF50");rw();}
 
-function renderOverview(){
-  const si={completed:"✅",ok:"✅",warn:"⚠️",block:"🔴",inprogress:"📋",locked:"🔒"};
-  const nc={completed:"done",ok:"done",warn:"warn",block:"",inprogress:"",locked:"lock"};
-  let html="";
-  for(const phase of PHASES){
-    html+=`<div><div class="phase-header" style="background:${phase.color}"><div><div style="font-weight:bold;font-size:15px">${phase.name} — ${phase.label}</div><div style="font-size:11px;opacity:0.75">Semanas ${phase.weeks[0]}–${phase.weeks[phase.weeks.length-1]}</div></div></div><div class="phase-body">`;
-    for(let i=0;i<phase.weeks.length;i++){
-      const w=phase.weeks[i];const{done,total,pct}=getProgress(w);const st=weekStatus(w);const cv=canView(w);
-      html+=`<div class="week-row${cv?" clickable":""}" ${cv?`onclick="currentWeek=${w};expandedDay=null;showView('week')"`:""} style="${i===phase.weeks.length-1?"border-bottom:none":""}${!cv?";opacity:0.35":""}"><div class="week-num ${nc[st]||""}">${cv?(si[st]||w):"🔒"}</div><div style="flex:1"><div style="font-size:14px;font-weight:bold">Semana ${w}</div><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${pct}%;background:${pct>=threshold?"#4CAF50":pct>=50?"#FF9800":phase.color}"></div></div></div><div style="font-size:12px;opacity:0.65;margin:0 8px">${cv?`${done}/${total}`:"—"}</div><div style="opacity:0.4">${cv?"›":"🔒"}</div></div>`;
-    }
-    html+=`</div></div>`;
+function ro(){
+const si={done:"v",perf:"*",ok:"v",warn:"!",blk:"x",prog:"~",fut:"?"};
+const nc={done:"done",perf:"done",ok:"done",warn:"warn",blk:"",prog:"cur",fut:""};
+let html="";
+for(const ph of PHS){
+  html+=`<div><div class="ph" style="background:${ph.c}"><div style="font-weight:bold;font-size:15px">${ph.n} - ${ph.l}</div><div style="font-size:11px;opacity:0.75">Semanas ${ph.w[0]}-${ph.w[ph.w.length-1]}</div></div><div class="pb2">`;
+  for(let i=0;i<ph.w.length;i++){
+    const w=ph.w[i];const{done,total,pct}=gpr(w);const st=wst(w);const fut=isF(w);
+    html+=`<div class="wr" onclick="cw2=${w};exD=null;sv('week')" style="${i===ph.w.length-1?"border-bottom:none":""}${fut?";opacity:0.55":""}">
+      <div class="wn ${nc[st]||""}">${si[st]||w}</div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:bold">Semana ${w}${fut?" <span style='font-size:11px;opacity:0.6'>(futura)</span>":""}</div>
+      <div class="mbb"><div class="mbf" style="width:${fut?100:pct}%;background:${fut?"rgba(20,160,196,0.25)":pct>=thr?"#4CAF50":pct>=50?"#FF9800":ph.c}"></div></div></div>
+      <div style="font-size:12px;opacity:0.65;margin:0 8px">${fut?"previa":done+"/"+total}</div>
+      <div style="opacity:0.4">></div>
+    </div>`;
   }
-  document.getElementById("overviewList").innerHTML=html;
+  html+=`</div></div>`;
+}
+document.getElementById("ovL").innerHTML=html;
 }
 
-function renderProgress(){
-  const totalSessions=Array.from({length:12},(_,i)=>i+1).flatMap(w=>getCheckable(w)).length;
-  const totalDone=Object.values(checks).filter(Boolean).length;
-  const pct=Math.round((totalDone/totalSessions)*100);
-  const totalDebts=Object.values(debtChecks).length;
-  const paidDebts=Object.values(debtChecks).filter(Boolean).length;
-  document.getElementById("statsGrid").innerHTML=`<div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value">${totalDone}</div><div class="stat-label">Sessões feitas</div></div><div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value">${pct}%</div><div class="stat-label">% Completo</div></div><div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">${unlockedUpTo}/12</div><div class="stat-label">Semanas avançadas</div></div><div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value">${paidDebts}/${totalDebts}</div><div class="stat-label">Débitos pagos</div></div>`;
-  document.getElementById("progressTotal").textContent=`${totalDone}/${totalSessions} sessões`;
-  document.getElementById("progressBar").style.width=pct+"%";
-  const milestones=[{label:"Primeira semana concluída",done:unlockedUpTo>1},{label:"Primeira negativa na barra",note:"Semana 5",done:unlockedUpTo>=5},{label:"Fase 1 concluída (4 semanas)",done:unlockedUpTo>4},{label:"Fase 2 concluída (8 semanas)",done:unlockedUpTo>8},{label:"10 barras completas! 🎉",done:false,isGoal:true}];
-  let mHtml="";
-  for(const m of milestones)mHtml+=`<div class="milestone"><div class="milestone-dot${m.done?" done":m.isGoal?" goal":""}">${m.done?"✓":m.isGoal?"🏆":""}</div><div><div style="font-size:14px;font-weight:${m.isGoal?"bold":"normal"}">${m.label}</div>${m.note?`<div style="font-size:12px;opacity:0.55">${m.note}</div>`:""}</div></div>`;
-  document.getElementById("milestones").innerHTML=mHtml;
+function rp(){
+const ts=Array.from({length:12},(_,i)=>i+1).flatMap(w=>gck(w)).length;
+const td2=Object.values(ch).filter(Boolean).length;const pct=Math.round((td2/ts)*100);
+const tdb=Object.values(dch).length;const pdb=Object.values(dch).filter(Boolean).length;
+document.getElementById("stG").innerHTML=`
+  <div class="sc2"><div style="font-size:22px">v</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${td2}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Sessoes feitas</div></div>
+  <div class="sc2"><div style="font-size:22px">%</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pct}%</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Completo</div></div>
+  <div class="sc2"><div style="font-size:22px">&#128197;</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${unl}/12</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Semanas avancadas</div></div>
+  <div class="sc2"><div style="font-size:22px">!</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pdb}/${tdb}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Debitos pagos</div></div>`;
+document.getElementById("pTot").textContent=td2+"/"+ts+" sessoes";
+document.getElementById("pBar").style.width=pct+"%";
+const mls=[{l:"Primeira semana concluida",d:unl>1},{l:"Primeira negativa na barra",n:"Semana 5 - FOCO: PUXAR",d:unl>=5},{l:"Fase 1 concluida (4 semanas)",d:unl>4},{l:"Fase 2 concluida (8 semanas)",d:unl>8},{l:"10 BARRAS COMPLETAS!",d:false,g:true}];
+let mh="";
+for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"v":m.g?"*":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
+document.getElementById("mils").innerHTML=mh;
 }
 
-function updateGlobal(){document.getElementById("globalBar").style.width=((unlockedUpTo-1)/12*100)+"%";document.getElementById("globalLabel").textContent=`Semana ${unlockedUpTo} de 12`;}
+function ug(){document.getElementById("gBar").style.width=((unl-1)/12*100)+"%";document.getElementById("gLbl").textContent="Semana "+unl+" de 12";}
+function sn(msg,color="#4CAF50"){const n=document.getElementById("notif");n.textContent=msg;n.style.background=color;n.style.display="block";setTimeout(()=>n.style.display="none",2500);}
+function rst(){if(confirm("Zerar todo o progresso?")){ch={};dch={};unl=1;cw2=1;exD=null;ss();rw();ug();}}
 
-function showNotif(msg,color="#4CAF50"){const n=document.getElementById("notif");n.textContent=msg;n.style.background=color;n.style.display="block";setTimeout(()=>n.style.display="none",2500);}
-
-function resetProgress(){if(confirm("Zerar todo o progresso?")){ checks={};debtChecks={};unlockedUpTo=1;currentWeek=1;expandedDay=null;saveState();renderWeek();updateGlobal();}}
-
-renderWeek();updateGlobal();
+rw();ug();
 </script>
 </body>
 </html>
