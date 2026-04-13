@@ -100,7 +100,7 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 <body>
 <div class="header">
   <div class="header-sub">Plano 12 Semanas</div>
-  <div class="header-title">Natacao + Calistenia</div>
+  <div class="header-title">🏊 Natação + 💪 Calistenia</div>
   <div class="pbw"><div class="pbbg"><div class="pbf" id="gBar" style="width:0%;background:#4CAF50"></div></div><span class="pbl" id="gLbl">Semana 1 de 12</span></div>
 </div>
 <div class="notif" id="notif" style="display:none"></div>
@@ -113,9 +113,9 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 <div class="page active" id="view-week">
   <div class="card" style="margin-top:14px">
     <div class="wsel">
-      <button class="warr" id="bPrev" onclick="cw(-1)">&#8249;</button>
+      <button class="warr" id="bPrev" onclick="cw(-1)">‹</button>
       <div class="wcen"><div class="wtit" id="wTit">Semana 1</div><div class="wpha" id="wPha"></div></div>
-      <button class="warr" id="bNext" onclick="cw(1)">&#8250;</button>
+      <button class="warr" id="bNext" onclick="cw(1)">›</button>
     </div>
     <div id="wBadge"></div>
     <div class="pbw"><div class="pbbg"><div class="pbf" id="wBar" style="width:0%"></div></div><span class="pbl" id="wLbl">0/0</span></div>
@@ -132,7 +132,7 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 
 <div class="page" id="view-overview">
   <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.6;margin:14px 0 12px">12 Semanas - Plano Elastico</div>
-  <div class="ib">Plano sem datas fixas - avanca conforme voce conclui. Faltou? Compensa e segue! Use as setas para visualizar semanas futuras e se preparar.</div>
+  <div class="ib">📅 Plano sem datas fixas — avança conforme você conclui. Faltou? Compensa e segue!<br>👁 Use as setas para visualizar semanas futuras e se preparar.</div>
   <div id="ovL"></div>
 </div>
 
@@ -201,14 +201,14 @@ function sv(v){document.querySelectorAll(".page").forEach(p=>p.classList.remove(
 function cw(d){const n=cw2+d;if(n<1||n>12)return;cw2=n;exD=null;ss();rw();}
 function uthr(v){thr=parseInt(v);document.getElementById("thrV").textContent=thr+"%";ss();rw();}
 
-function adv(){const{pct,total,done}=gpr(cw2);if(pct<50){sn("Complete pelo menos 50% para avancar!","#E53935");return;}
+function adv(){const{pct,total,done}=gpr(cw2);if(pct<50){sn("🔒 Complete pelo menos 50% para avançar!","#E53935");return;}
 if(pct<thr){if(!confirm("Avancar com "+(total-done)+" treino(s) em debito?\nEles aparecerao para compensacao."))return;}
 const ms=gck(cw2).filter(s=>!ch[sk(cw2,s.day,s.per)]);
 ms.forEach(s=>{const k=dk(cw2,s.day,s.per);if(!(k in dch))dch[k]=false;});
-if(cw2<12){unl=Math.max(unl,cw2+1);cw2++;exD=null;ss();sn("Semana "+(cw2-1)+" concluida! Avancando...","#4CAF50");setTimeout(()=>rw(),300);}
-else{sn("Plano completo! Incrivel!","#FFD700");}}
+if(cw2<12){unl=Math.max(unl,cw2+1);cw2++;exD=null;ss();sn("🎉 Semana "+(cw2-1)+" concluída! Avançando...","#4CAF50");setTimeout(()=>rw(),300);}
+else{sn("🏆 Plano completo! Incrível!","#FFD700");}}
 
-function tgd(w,d,p){const k=dk(w,d,p);dch[k]=!dch[k];ss();rw();if(dch[k])sn("Debito compensado!","#4CAF50");}
+function tgd(w,d,p){const k=dk(w,d,p);dch[k]=!dch[k];ss();rw();if(dch[k])sn("✅ Débito compensado!","#4CAF50");}
 
 function rw(){
 const ph=gph(cw2);const{done,total,pct}=gpr(cw2);const nd=Math.ceil(total*thr/100);const st=wst(cw2);const fut=isF(cw2);
@@ -235,24 +235,24 @@ document.getElementById("bPrev").disabled=cw2<=1;
 document.getElementById("bNext").disabled=cw2>=12;
 ug();
 
-document.getElementById("futB").innerHTML=fut?`<div class="futb">Voce esta visualizando uma semana futura. Os treinos nao podem ser marcados ainda.</div>`:"";
+document.getElementById("futB").innerHTML=fut?`<div class="futb">👁 Você está visualizando uma semana futura. Os treinos não podem ser marcados ainda.</div>`:"";
 
 const pd=[];
 for(const k in dch){if(dch[k]===false){const m=k.match(/dbt_w(\d+)_d(\d+)_(.+)/);if(m){const dw=parseInt(m[1]),dd=parseInt(m[2]),dp=m[3];const ses=gws(dw).find(s=>s.day===dd&&s.per===dp);if(ses)pd.push({k,w:dw,d:dd,p:dp,ses});}}}
 let dh="";
 if(!fut&&pd.length>0){
-  dh=`<div class="debt-panel"><div class="debt-t">Treinos em debito (${pd.length}) - compense quando puder</div>`;
-  for(const{w,d,p,ses}of pd){const paid=dch[dk(w,d,p)];dh+=`<div class="di2"><div><div style="font-size:13px;font-weight:bold">${ses.lbl}${ses.foc?" - "+ses.foc:""}</div><div style="font-size:11px;opacity:0.6">Semana ${w} - ${DN[d]}</div></div><button class="dc${paid?" done":""}" onclick="tgd(${w},${d},'${p}')">${paid?"v":"+"}</button></div>`;}
+  dh=`<div class="debt-panel"><div class="debt-t">⚠️ Treinos em débito (${pd.length}) — compense quando puder</div>`;
+  for(const{w,d,p,ses}of pd){const paid=dch[dk(w,d,p)];dh+=`<div class="di2"><div><div style="font-size:13px;font-weight:bold">${ses.lbl}${ses.foc?" - "+ses.foc:""}</div><div style="font-size:11px;opacity:0.6">Semana ${w} - ${DN[d]}</div></div><button class="dc${paid?" done":""}" onclick="tgd(${w},${d},'${p}')">&#x2713;</button></div>`;}
   dh+=`</div>`;
 }
 document.getElementById("debtP").innerHTML=dh;
 
 let ah="";
 if(!fut&&st!=="done"&&st!=="perf"){
-  if(pct>=thr)ah=`<button class="ab ab-ok" onclick="adv()">Concluir Semana ${cw2} e Avancar</button>`;
-  else if(pct>=50)ah=`<button class="ab ab-w" onclick="adv()">Avancar com debito (${total-done} pendente${total-done>1?"s":""})</button>`;
-  else ah=`<button class="ab ab-lk" disabled>Complete pelo menos 50% para avancar</button>`;
-}else if(!fut){ah=`<div style="text-align:center;opacity:0.6;font-size:13px;margin-bottom:10px">Semana concluida - use as setas para navegar</div>`;}
+  if(pct>=thr)ah=`<button class="ab ab-ok" onclick="adv()">✅ Concluir Semana ${cw2} e Avançar →</button>`;
+  else if(pct>=50)ah=`<button class="ab ab-w" onclick="adv()">⚠️ Avançar com débito (${total-done} pendente${total-done>1?"s":""})</button>`;
+  else ah=`<button class="ab ab-lk" disabled>🔒 Complete pelo menos 50% para avançar</button>`;
+}else if(!fut){ah=`<div style="text-align:center;opacity:0.6;font-size:13px;margin-bottom:10px">✅ Semana concluída — use as setas para navegar</div>`;}
 document.getElementById("advP").innerHTML=ah;
 
 const ses=gws(cw2);let html="";
@@ -263,7 +263,7 @@ for(let di=0;di<7;di++){
   const aoff=ds.every(s=>s.type==="off");const adone=!fut&&dtot>0&&ddn===dtot;
   html+=`<button class="db${isE?" exp":""}${fut?" fut":""}" onclick="td(${di})">
     <div style="display:flex;align-items:center;flex:1">
-      <div class="di${adone?" done":""}">${aoff?"&#127958;":(adone?"&#9989;":DN[di].substring(0,3))}</div>
+      <div class="di${adone?" done":""}">${aoff?"🏖":(adone?"✅":DN[di].substring(0,3))}</div>
       <div class="dinf"><div class="dnam">${DN[di]}</div>
       <div class="dsub">${aoff?"Descanso":ds.map(s=>s.lbl+(s.foc?" ("+s.foc+")":"")).join(" | ")}</div></div>
     </div>
@@ -282,7 +282,7 @@ for(let di=0;di<7;di++){
       if(s.dsc.length>1){for(const x of s.dsc)html+=`<div class="sdesc sdi">${x}</div>`;}
       else html+=`<div class="sdesc">${s.dsc[0]}</div>`;
       html+=`</div></div>`;
-      if(!isO)html+=`<button class="cb${isd?" done":""}" ${fut?"disabled":""} onclick="${fut?"":"tc2("+cw2+","+s.day+",'"+s.per+"')"}">${isd?"v":""}</button>`;
+      if(!isO)html+=`<button class="cb${isd?" done":""}" ${fut?"disabled":""} onclick="${fut?"":"tc2("+cw2+","+s.day+",'"+s.per+"')"}">${isd?"✓":""}</button>`;
       html+=`</div>`;
     }
     html+=`</div>`;
@@ -292,10 +292,10 @@ document.getElementById("dayL").innerHTML=html;
 }
 
 function td(d){exD=exD===d?null:d;rw();}
-function tc2(w,d,p){if(isF(w))return;const k=sk(w,d,p);ch[k]=!ch[k];ss();if(ch[k])sn("Treino marcado!","#4CAF50");rw();}
+function tc2(w,d,p){if(isF(w))return;const k=sk(w,d,p);ch[k]=!ch[k];ss();if(ch[k])sn("✅ Treino marcado!","#4CAF50");rw();}
 
 function ro(){
-const si={done:"v",perf:"*",ok:"v",warn:"!",blk:"x",prog:"~",fut:"?"};
+const si={done:"✅",perf:"🏆",ok:"✅",warn:"⚠️",blk:"🔴",prog:"📋",fut:"👁"};
 const nc={done:"done",perf:"done",ok:"done",warn:"warn",blk:"",prog:"cur",fut:""};
 let html="";
 for(const ph of PHS){
@@ -307,7 +307,7 @@ for(const ph of PHS){
       <div style="flex:1"><div style="font-size:14px;font-weight:bold">Semana ${w}${fut?" <span style='font-size:11px;opacity:0.6'>(futura)</span>":""}</div>
       <div class="mbb"><div class="mbf" style="width:${fut?100:pct}%;background:${fut?"rgba(20,160,196,0.25)":pct>=thr?"#4CAF50":pct>=50?"#FF9800":ph.c}"></div></div></div>
       <div style="font-size:12px;opacity:0.65;margin:0 8px">${fut?"previa":done+"/"+total}</div>
-      <div style="opacity:0.4">></div>
+      <div style="opacity:0.4">›</div>
     </div>`;
   }
   html+=`</div></div>`;
@@ -320,15 +320,15 @@ const ts=Array.from({length:12},(_,i)=>i+1).flatMap(w=>gck(w)).length;
 const td2=Object.values(ch).filter(Boolean).length;const pct=Math.round((td2/ts)*100);
 const tdb=Object.values(dch).length;const pdb=Object.values(dch).filter(Boolean).length;
 document.getElementById("stG").innerHTML=`
-  <div class="sc2"><div style="font-size:22px">v</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${td2}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Sessoes feitas</div></div>
-  <div class="sc2"><div style="font-size:22px">%</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pct}%</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Completo</div></div>
+  <div class="sc2"><div style="font-size:22px">✅</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${td2}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Sessoes feitas</div></div>
+  <div class="sc2"><div style="font-size:22px">📈</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pct}%</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Completo</div></div>
   <div class="sc2"><div style="font-size:22px">&#128197;</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${unl}/12</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Semanas avancadas</div></div>
-  <div class="sc2"><div style="font-size:22px">!</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pdb}/${tdb}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Debitos pagos</div></div>`;
+  <div class="sc2"><div style="font-size:22px">⚠️</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pdb}/${tdb}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Debitos pagos</div></div>`;
 document.getElementById("pTot").textContent=td2+"/"+ts+" sessoes";
 document.getElementById("pBar").style.width=pct+"%";
 const mls=[{l:"Primeira semana concluida",d:unl>1},{l:"Primeira negativa na barra",n:"Semana 5 - FOCO: PUXAR",d:unl>=5},{l:"Fase 1 concluida (4 semanas)",d:unl>4},{l:"Fase 2 concluida (8 semanas)",d:unl>8},{l:"10 BARRAS COMPLETAS!",d:false,g:true}];
 let mh="";
-for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"v":m.g?"*":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
+for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"✓":m.g?"🏆":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
 document.getElementById("mils").innerHTML=mh;
 }
 
