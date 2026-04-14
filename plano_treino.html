@@ -147,39 +147,94 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 </div>
 
 <script>
-const NAT={1:"5x2min | +1min pausa | Bracao e respiracao",2:"5x2min | +1min pausa | Alterne crawl e costas",3:"5x2min | +1min pausa | Ritmo constante",4:"6x2.5min | +45s pausa | 2 costas + 4 crawl",5:"6x2.5min | +45s pausa | Cadencia de bracada",6:"6x2.5min | +45s pausa | Tecnica de virada",7:"5x4min | +1min pausa | +1 sprint 30s ao final",8:"5x4min | +1min pausa | +2 sprints 20s ao final",9:"4x5min | +1min pausa | +2 sprints 30s ao final",10:"4x5min | +1min pausa | Resistencia maxima",11:"4x5min | +1min pausa | Simulacao de prova",12:"4x5min | +1min pausa | Sessao de performance total"};
-
-const CA={
-1:[[{f:"PUXAR",i:["Dead hang 3x20s","Scapular pull 3x10","Remada invertida 3x8","Flexao supinada 3x8"]},{f:"EMPURRAR+CORE",i:["Flexao joelho 4x10","Flexao larga 3x8","Prancha frontal 3x30s","Prancha lateral 2x20s cada","Abdominal bicicleta 3x15"]},{f:"CIRCUITO",i:["3 rodadas: Dead hang 20s / Flexao 8 / Knee raise 8 / Prancha 20s","Descanso 90s entre rodadas","Foco: nao parar dentro da rodada"]}]],
-2:[[{f:"PUXAR",i:["Dead hang 3x25s","Scapular pull 3x12","Remada invertida 3x10","Flexao supinada 3x10"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x10","Flexao diamante 3x8","Prancha frontal 3x35s","Prancha lateral 2x25s cada","Abdominal bicicleta 3x20"]},{f:"CIRCUITO",i:["3 rodadas: Dead hang 25s / Flexao 10 / Knee raise 10 / Prancha 25s","Descanso 75s entre rodadas","Mantenha a qualidade ate a ultima rodada"]}]],
-3:[[{f:"PUXAR",i:["Dead hang 3x30s","Scapular pull 3x12","Remada invertida 3x12","Flexao supinada 4x8"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x12","Flexao pes elevados 3x8","Prancha frontal 3x40s","Prancha lateral 2x30s cada","L-sit tentativa 3x10s"]},{f:"CIRCUITO",i:["4 rodadas: Dead hang 25s / Flexao 10 / Knee raise 12 / Prancha 30s","Descanso 60s entre rodadas","Esta ficando mais facil?"]}]],
-4:[[{f:"PUXAR",i:["Dead hang 3x35s","Scapular pull 3x15","Remada invertida 4x10","Flexao supinada 4x10"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x15","Flexao pes elevados 3x10","Prancha frontal 3x45s","Prancha lateral 2x35s cada","L-sit 3x12s"]},{f:"CIRCUITO",i:["4 rodadas: Dead hang 30s / Flexao 12 / Knee raise 12 / Prancha 35s","Descanso 60s entre rodadas","Fase 1 concluida - teste seu max de dead hang!"]}]],
-5:[[{f:"PUXAR",i:["Scapular pull 4x12","NEGATIVA BARRA 4x3 (5s de descida)","Remada invertida 4x10","Dead hang 2x30s"]},{f:"EMPURRAR+CORE",i:["Flexao normal 4x15","Flexao pes elevados 4x10","Prancha frontal 3x45s","Prancha lateral 3x30s cada","Dragon flag excentrico 3x3"]},{f:"CIRCUITO",i:["4 rodadas: Negativa barra 2 reps / Flexao 12 / Knee raise 15 / Prancha 40s","Descanso 60s entre rodadas","A negativa e a chave - foco na descida lenta"]}]],
-6:[[{f:"PUXAR",i:["Scapular pull 4x12","NEGATIVA BARRA 4x4 (5s de descida)","Remada invertida 4x12","Dead hang 2x35s"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x12","Flexao diamante 3x10","Prancha frontal 3x50s","Prancha lateral 3x35s cada","Dragon flag excentrico 3x4"]},{f:"CIRCUITO",i:["4 rodadas: Negativa 3 reps / Flexao elevada 10 / Knee raise 15 / Prancha 40s","Descanso 55s entre rodadas"]}]],
-7:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (5s de descida)","Remada invertida 4x12","Dead hang 2x40s - bata seu recorde!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x12","Flexao diamante 3x12","Prancha frontal 3x50s","L-sit 3x15s","Dragon flag excentrico 3x4"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 3 reps / Flexao elevada 12 / Knee raise 15 / Prancha 45s","Descanso 50s entre rodadas"]}]],
-8:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (6s de descida)","Barra com elastico 3x2 (se disponivel)","Dead hang maximo - registre o tempo!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x15","Flexao diamante 4x10","Prancha frontal 3x55s","L-sit 3x18s","Dragon flag excentrico 3x5"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 4 reps / Flexao elevada 12 / Knee raise 18 / Prancha 50s","Descanso 45s entre rodadas","Fase 2 concluida - voce esta perto da barra!"]}]],
-9:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (7s de descida)","Barra com elastico 4x3","Dead hang maximo"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 4x15","Flexao diamante 4x12","Prancha frontal 3x60s","L-sit 3x20s","Dragon flag 3x3 (completo)"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 4 reps (7s) / Flexao elevada 12 / Knee raise 20 / Prancha 50s","Descanso 40s entre rodadas"]}]],
-10:[[{f:"PUXAR",i:["Scapular pull 4x15","NEGATIVA BARRA 4x5 (7s de descida)","Barra com elastico 4x4","Dead hang maximo - bata seu recorde!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x12","Prancha frontal 4x60s","L-sit 3x22s","Dragon flag 3x4"]},{f:"CIRCUITO",i:["5 rodadas: Negativa 5 reps (7s) / Flexao elevada 15 / Knee raise 20 / Prancha 55s","Descanso 35s entre rodadas"]}]],
-11:[[{f:"PUXAR",i:["Negativa barra 4x5 (8s de descida)","Barra com elastico 4x5","Scapular pull 3x15","Tente 1 BARRA COMPLETA sem elastico - sem pressao!"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x15","Prancha frontal 4x60s","Dragon flag 3x4","L-sit 3x25s"]},{f:"CIRCUITO",i:["6 rodadas: Negativa 5 reps (8s) / Flexao elevada 15 / Knee raise 20 / Prancha 60s","Descanso 30s entre rodadas","Ultima semana antes da performance!"]}]],
-12:[[{f:"PUXAR",i:["Negativa barra 4x5 (8s de descida)","BARRA COMPLETA - max de repeticoes!","Scapular pull 3x15 (warm-down)","Dead hang final - registre seu tempo maximo"]},{f:"EMPURRAR+CORE",i:["Flexao pes elevados 5x15","Flexao diamante 4x15","Prancha frontal 4x60s","Dragon flag 3x5","L-sit 3x30s"]},{f:"CIRCUITO FINAL",i:["6 rodadas: Barra/Negativa / Flexao elevada 15 / Knee raise 20 / Prancha 60s","Descanso 30s entre rodadas","Voce chegou ate aqui - celebre cada repeticao!"]}]]
+const NAT={
+1:["⏱️ ~30 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","5 séries × 2 min | Pausa: 1 min entre séries","Foco: braçada consistente e respiração rítmica","──────────────","Desaquecimento: 2 min nado leve"],
+2:["⏱️ ~30 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","5 séries × 2 min | Pausa: 1 min entre séries","Alterne: 2 séries costas + 3 séries crawl","──────────────","Desaquecimento: 2 min nado leve"],
+3:["⏱️ ~30 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","5 séries × 2 min | Pausa: 1 min entre séries","Foco: manter ritmo constante do início ao fim","──────────────","Desaquecimento: 2 min nado leve"],
+4:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","6 séries × 2,5 min | Pausa: 45s entre séries","2 séries costas + 4 séries crawl","──────────────","Desaquecimento: 2 min nado leve"],
+5:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","6 séries × 2,5 min | Pausa: 45s entre séries","Foco: aumentar cadência de braçada","──────────────","Desaquecimento: 2 min nado leve"],
+6:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","6 séries × 2,5 min | Pausa: 45s entre séries","Foco: técnica de virada e entrada da mão","──────────────","Desaquecimento: 2 min nado leve"],
+7:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","5 séries × 4 min | Pausa: 1 min entre séries","+ 1 sprint de 30s ao final | Pausa: 2 min antes do sprint","──────────────","Desaquecimento: 2 min nado leve"],
+8:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","5 séries × 4 min | Pausa: 1 min entre séries","+ 2 sprints de 20s ao final | Pausa: 90s entre sprints","──────────────","Desaquecimento: 2 min nado leve"],
+9:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","4 séries × 5 min | Pausa: 1 min entre séries","+ 2 sprints de 30s ao final | Pausa: 90s entre sprints","──────────────","Desaquecimento: 2 min nado leve"],
+10:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","4 séries × 5 min | Pausa: 1 min entre séries","Foco: resistência máxima — não reduza o ritmo","+ 2 sprints de 30s | Pausa: 90s entre sprints","──────────────","Desaquecimento: 2 min nado leve"],
+11:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","4 séries × 5 min | Pausa: 1 min entre séries","Simulação de prova — ritmo forte e constante","+ 2 sprints de 30s | Pausa: 90s entre sprints","──────────────","Desaquecimento: 2 min nado leve"],
+12:["⏱️ ~35 min total","Aquecimento: 3 min nado leve sem elástico","──────────────","4 séries × 5 min | Pausa: 1 min entre séries","Sessão de performance total — dê o seu máximo!","+ 3 sprints de 30s | Pausa: 90s entre sprints","──────────────","Desaquecimento: 2 min nado leve 🏆"]
 };
 
+const CA={
+1:[[
+{f:"PUXAR",t:"⏱️ ~30 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Dead hang: 4 × 20s | Pausa: 45s entre séries","Scapular pull: 4 × 10 | Pausa: 60s entre séries","Remada invertida: 3 × 8 | Pausa: 60s entre séries","Flexão supinada (bíceps): 3 × 8 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~30 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão com joelho: 4 × 12 | Pausa: 60s entre séries","Flexão aberta: 3 × 10 | Pausa: 60s entre séries","Prancha frontal: 3 × 30s | Pausa: 45s entre séries","Prancha lateral: 3 × 20s cada lado | Pausa: 30s entre lados","Abdominal bicicleta: 3 × 15 | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~30 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","3 rodadas do circuito abaixo | Pausa: 90s entre rodadas","  → Dead hang: 20s","  → Flexão: 8 reps","  → Knee raise: 8 reps","  → Prancha: 20s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+2:[[
+{f:"PUXAR",t:"⏱️ ~32 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Dead hang: 4 × 25s | Pausa: 45s entre séries","Scapular pull: 4 × 12 | Pausa: 60s entre séries","Remada invertida: 3 × 10 | Pausa: 60s entre séries","Flexão supinada: 3 × 10 | Pausa: 60s entre séries","Flexão com pegada neutra: 2 × 8 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~32 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão normal: 4 × 12 | Pausa: 60s entre séries","Flexão diamante: 3 × 8 | Pausa: 60s entre séries","Prancha frontal: 3 × 35s | Pausa: 45s entre séries","Prancha lateral: 3 × 25s cada lado | Pausa: 30s entre lados","Abdominal bicicleta: 3 × 20 | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~32 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","3 rodadas do circuito abaixo | Pausa: 75s entre rodadas","  → Dead hang: 25s","  → Flexão: 10 reps","  → Knee raise: 10 reps","  → Prancha: 25s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+3:[[
+{f:"PUXAR",t:"⏱️ ~33 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Dead hang: 4 × 30s | Pausa: 45s entre séries","Scapular pull: 4 × 12 | Pausa: 60s entre séries","Remada invertida: 4 × 10 | Pausa: 60s entre séries","Flexão supinada: 4 × 8 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~33 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão normal: 4 × 12 | Pausa: 60s entre séries","Flexão pés elevados: 3 × 8 | Pausa: 60s entre séries","Prancha frontal: 3 × 40s | Pausa: 45s entre séries","Prancha lateral: 3 × 30s cada lado | Pausa: 30s entre lados","L-sit (tentativa): 3 × 10s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~33 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","4 rodadas do circuito abaixo | Pausa: 60s entre rodadas","  → Dead hang: 25s","  → Flexão: 10 reps","  → Knee raise: 12 reps","  → Prancha: 30s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+4:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Dead hang: 4 × 35s | Pausa: 45s entre séries","Scapular pull: 4 × 15 | Pausa: 60s entre séries","Remada invertida: 4 × 12 | Pausa: 60s entre séries","Flexão supinada: 4 × 10 | Pausa: 60s entre séries","──────────────","Teste: Dead hang máximo ao final — registre seu tempo!","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão normal: 4 × 15 | Pausa: 60s entre séries","Flexão pés elevados: 3 × 10 | Pausa: 60s entre séries","Prancha frontal: 3 × 45s | Pausa: 45s entre séries","Prancha lateral: 3 × 35s cada lado | Pausa: 30s entre lados","L-sit: 3 × 12s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","4 rodadas do circuito abaixo | Pausa: 60s entre rodadas","  → Dead hang: 30s","  → Flexão: 12 reps","  → Knee raise: 12 reps","  → Prancha: 35s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Fase 1 concluída! Desaquecimento: 3 min alongamento geral"]}
+]],
+5:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 12 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 3 reps (desça em 5s) | Pausa: 90s entre séries","Remada invertida: 4 × 12 | Pausa: 60s entre séries","Dead hang: 3 × 30s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão normal: 4 × 15 | Pausa: 60s entre séries","Flexão pés elevados: 4 × 10 | Pausa: 60s entre séries","Prancha frontal: 3 × 45s | Pausa: 45s entre séries","Prancha lateral: 3 × 30s cada lado | Pausa: 30s entre lados","Dragon flag excêntrico: 3 × 3 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","4 rodadas do circuito abaixo | Pausa: 60s entre rodadas","  → Negativa barra: 2 reps (5s)","  → Flexão: 12 reps","  → Knee raise: 15 reps","  → Prancha: 40s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","A negativa é a chave — foco total na descida lenta!","Desaquecimento: 3 min alongamento geral"]}
+]],
+6:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 12 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 4 reps (desça em 5s) | Pausa: 90s entre séries","Remada invertida: 4 × 12 | Pausa: 60s entre séries","Dead hang: 3 × 35s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 4 × 12 | Pausa: 60s entre séries","Flexão diamante: 3 × 10 | Pausa: 60s entre séries","Prancha frontal: 3 × 50s | Pausa: 45s entre séries","Prancha lateral: 3 × 35s cada lado | Pausa: 30s entre lados","Dragon flag excêntrico: 3 × 4 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","4 rodadas do circuito abaixo | Pausa: 55s entre rodadas","  → Negativa barra: 3 reps (5s)","  → Flexão elevada: 10 reps","  → Knee raise: 15 reps","  → Prancha: 40s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+7:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 15 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 5 reps (desça em 5s) | Pausa: 90s entre séries","Remada invertida: 4 × 12 | Pausa: 60s entre séries","Dead hang: 3 × 40s | Pausa: 45s entre séries — tente bater seu recorde!","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 4 × 12 | Pausa: 60s entre séries","Flexão diamante: 3 × 12 | Pausa: 60s entre séries","Prancha frontal: 3 × 50s | Pausa: 45s entre séries","L-sit: 3 × 15s | Pausa: 45s entre séries","Dragon flag excêntrico: 3 × 4 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","5 rodadas do circuito abaixo | Pausa: 50s entre rodadas","  → Negativa barra: 3 reps (5s)","  → Flexão elevada: 12 reps","  → Knee raise: 15 reps","  → Prancha: 45s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+8:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 15 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 5 reps (desça em 6s) | Pausa: 90s entre séries","Barra com elástico: 3 × 2 reps (se disponível) | Pausa: 90s entre séries","Dead hang máximo — registre o tempo!","──────────────","Fase 2 concluída! Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 4 × 15 | Pausa: 60s entre séries","Flexão diamante: 4 × 10 | Pausa: 60s entre séries","Prancha frontal: 3 × 55s | Pausa: 45s entre séries","L-sit: 3 × 18s | Pausa: 45s entre séries","Dragon flag excêntrico: 3 × 5 | Pausa: 60s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","5 rodadas do circuito abaixo | Pausa: 45s entre rodadas","  → Negativa barra: 4 reps (6s)","  → Flexão elevada: 12 reps","  → Knee raise: 18 reps","  → Prancha: 50s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Você está muito perto da barra! Desaquecimento: 3 min alongamento geral"]}
+]],
+9:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 15 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 5 reps (desça em 7s) | Pausa: 90s entre séries","Barra com elástico: 4 × 3 reps | Pausa: 90s entre séries","Dead hang máximo | Pausa: 2 min antes do teste","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 4 × 15 | Pausa: 60s entre séries","Flexão diamante: 4 × 12 | Pausa: 60s entre séries","Prancha frontal: 3 × 60s | Pausa: 45s entre séries","L-sit: 3 × 20s | Pausa: 45s entre séries","Dragon flag completo: 3 × 3 | Pausa: 75s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","5 rodadas do circuito abaixo | Pausa: 40s entre rodadas","  → Negativa barra: 4 reps (7s)","  → Flexão elevada: 12 reps","  → Knee raise: 20 reps","  → Prancha: 50s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+10:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Scapular pull: 4 × 15 | Pausa: 60s entre séries","NEGATIVA BARRA: 4 × 5 reps (desça em 7s) | Pausa: 90s entre séries","Barra com elástico: 4 × 4 reps | Pausa: 90s entre séries","Dead hang máximo — bata seu recorde!","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 5 × 15 | Pausa: 60s entre séries","Flexão diamante: 4 × 12 | Pausa: 60s entre séries","Prancha frontal: 4 × 60s | Pausa: 45s entre séries","L-sit: 3 × 22s | Pausa: 45s entre séries","Dragon flag completo: 3 × 4 | Pausa: 75s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","5 rodadas do circuito abaixo | Pausa: 35s entre rodadas","  → Negativa barra: 5 reps (7s)","  → Flexão elevada: 15 reps","  → Knee raise: 20 reps","  → Prancha: 55s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Desaquecimento: 3 min alongamento geral"]}
+]],
+11:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Negativa barra: 4 × 5 reps (desça em 8s) | Pausa: 90s entre séries","Barra com elástico: 4 × 5 reps | Pausa: 90s entre séries","Scapular pull: 3 × 15 | Pausa: 60s entre séries","TENTE 1 BARRA COMPLETA sem elástico! | Pausa: 3 min antes da tentativa","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 5 × 15 | Pausa: 60s entre séries","Flexão diamante: 4 × 15 | Pausa: 60s entre séries","Prancha frontal: 4 × 60s | Pausa: 45s entre séries","Dragon flag completo: 3 × 4 | Pausa: 75s entre séries","L-sit: 3 × 25s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","6 rodadas do circuito abaixo | Pausa: 30s entre rodadas","  → Negativa barra: 5 reps (8s)","  → Flexão elevada: 15 reps","  → Knee raise: 20 reps","  → Prancha: 60s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","Última semana antes da performance! Desaquecimento: 3 min alongamento geral"]}
+]],
+12:[[
+{f:"PUXAR",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e escápulas","──────────────","Negativa barra: 4 × 5 reps (desça em 8s) | Pausa: 90s entre séries","BARRA COMPLETA — máximo de repetições! | Pausa: 3 min antes do teste","Scapular pull: 3 × 15 (warm-down) | Pausa: 60s entre séries","Dead hang final — registre seu tempo máximo 🏆","──────────────","Desaquecimento: 3 min alongamento de ombros e costas"]},
+{f:"EMPURRAR + CORE",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade de ombros e core","──────────────","Flexão pés elevados: 5 × 15 | Pausa: 60s entre séries","Flexão diamante: 4 × 15 | Pausa: 60s entre séries","Prancha frontal: 4 × 60s | Pausa: 45s entre séries","Dragon flag completo: 3 × 5 | Pausa: 75s entre séries","L-sit: 3 × 30s | Pausa: 45s entre séries","──────────────","Desaquecimento: 3 min alongamento de peito e abdômen"]},
+{f:"CIRCUITO FINAL",t:"⏱️ ~35 min",i:["Aquecimento: 5 min mobilidade geral","──────────────","6 rodadas do circuito abaixo | Pausa: 30s entre rodadas","  → Barra completa ou negativa: máximo","  → Flexão elevada: 15 reps","  → Knee raise: 20 reps","  → Prancha: 60s","  → Pausa dentro da rodada: 15s entre exercícios","──────────────","🏆 Você chegou até aqui — celebre cada repetição!"]}
+]]
+};
 const PHS=[{n:"FASE 1",l:"Adaptacao",w:[1,2,3,4],c:"#0D7377"},{n:"FASE 2",l:"Construcao",w:[5,6,7,8],c:"#14A0C4"},{n:"FASE 3",l:"Performance",w:[9,10,11,12],c:"#1B2A4A"}];
-const DN=["Segunda","Terca","Quarta","Quinta","Sexta","Sabado","Domingo"];
+const DN=["Segunda","Terça","Quarta","Quinta","Sexta","Sábado","Domingo"];
 
 function gws(w){const c=CA[w][0];return[
-{day:0,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
-{day:0,per:"noite",type:"cali",lbl:"Calistenia",foc:c[0].f,dsc:c[0].i},
-{day:1,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
-{day:1,per:"noite",type:"rest",lbl:"Recuperacao",foc:"",dsc:["Alongamento 10min + mobilidade ombros e quadril"]},
-{day:2,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
-{day:2,per:"noite",type:"cali",lbl:"Calistenia",foc:c[1].f,dsc:c[1].i},
-{day:3,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
-{day:3,per:"noite",type:"rest",lbl:"Recuperacao",foc:"",dsc:["Alongamento 10min + mobilidade ombros e quadril"]},
-{day:4,per:"manha",type:"swim",lbl:"Natacao",foc:"",dsc:[NAT[w]]},
-{day:4,per:"noite",type:"cali",lbl:"Calistenia",foc:c[2].f,dsc:c[2].i},
-{day:5,per:"dia",type:"off",lbl:"Descanso ativo",foc:"",dsc:["Caminhada leve ou mobilidade - sem carga"]},
-{day:6,per:"dia",type:"off",lbl:"Descanso total",foc:"",dsc:["Recuperacao completa - o musculo cresce aqui!"]},
+{day:0,per:"manhã",type:"cali",lbl:"💪 Calistenia",foc:c[0].f,dur:c[0].t,dsc:c[0].i},
+{day:1,per:"manhã",type:"swim",lbl:"🏊 Natação",foc:"",dur:"",dsc:NAT[w]},
+{day:2,per:"manhã",type:"cali",lbl:"💪 Calistenia",foc:c[1].f,dur:c[1].t,dsc:c[1].i},
+{day:3,per:"manhã",type:"swim",lbl:"🏊 Natação",foc:"",dur:"",dsc:NAT[w]},
+{day:4,per:"manhã",type:"cali",lbl:"💪 Calistenia",foc:c[2].f,dur:c[2].t,dsc:c[2].i},
+{day:5,per:"manhã",type:"swim",lbl:"🏊 Natação",foc:"",dur:"",dsc:NAT[w]},
+{day:6,per:"dia",type:"off",lbl:"😴 Descanso total",foc:"",dur:"",dsc:["Recuperação completa — é aqui que o músculo cresce!","Hidrate-se bem e durma pelo menos 7h."]},
 ];}
 
 function gph(w){return PHS.find(p=>p.w.includes(w))||PHS[0];}
@@ -202,7 +257,7 @@ function cw(d){const n=cw2+d;if(n<1||n>12)return;cw2=n;exD=null;ss();rw();}
 function uthr(v){thr=parseInt(v);document.getElementById("thrV").textContent=thr+"%";ss();rw();}
 
 function adv(){const{pct,total,done}=gpr(cw2);if(pct<50){sn("🔒 Complete pelo menos 50% para avançar!","#E53935");return;}
-if(pct<thr){if(!confirm("Avancar com "+(total-done)+" treino(s) em debito?\nEles aparecerao para compensacao."))return;}
+if(pct<thr){if(!confirm("Avançar com "+(total-done)+" treino(s) em débito?\nEles aparecerao para compensacao."))return;}
 const ms=gck(cw2).filter(s=>!ch[sk(cw2,s.day,s.per)]);
 ms.forEach(s=>{const k=dk(cw2,s.day,s.per);if(!(k in dch))dch[k]=false;});
 if(cw2<12){unl=Math.max(unl,cw2+1);cw2++;exD=null;ss();sn("🎉 Semana "+(cw2-1)+" concluída! Avançando...","#4CAF50");setTimeout(()=>rw(),300);}
@@ -218,17 +273,17 @@ document.getElementById("wPha").style.color=ph.c==="#1B2A4A"?"#14A0C4":ph.c;
 document.getElementById("thrS").value=thr;
 document.getElementById("thrV").textContent=thr+"%";
 const flt=Math.max(0,nd-done);
-document.getElementById("thrN").textContent=fut?"(visualizacao)":(flt>0?"Faltam "+flt+" treino"+(flt>1?"s":""):(done===total?"Perfeito!":"Meta atingida"));
+document.getElementById("thrN").textContent=fut?"(visualização)":(flt>0?"Faltam "+flt+" treino"+(flt>1?"s":""):(done===total?"Perfeito!":"Meta atingida"));
 let bc=fut?"rgba(20,160,196,0.3)":pct>=thr?"#4CAF50":pct>=50?"#FF9800":pct>0?"#E53935":"rgba(255,255,255,0.2)";
 document.getElementById("wBar").style.width=(fut?100:pct)+"%";
 document.getElementById("wBar").style.background=bc;
-document.getElementById("wLbl").textContent=fut?"Previa":done+"/"+total+" ("+pct+"%)";
+document.getElementById("wLbl").textContent=fut?"Prévia":done+"/"+total+" ("+pct+"%)";
 let bh="";
-if(fut)bh=`<span class="sb sb-fut">Visualizacao - semana futura</span>`;
-else if(st==="done"||st==="perf")bh=`<span class="sb sb-done">Semana concluida</span>`;
-else if(pct>=thr)bh=`<span class="sb sb-ok">Meta atingida - pode avancar!</span>`;
-else if(pct>=50)bh=`<span class="sb sb-warn">Abaixo da meta - avance com debito</span>`;
-else if(done>0)bh=`<span class="sb sb-blk">Complete mais treinos para avancar</span>`;
+if(fut)bh=`<span class="sb sb-fut">Visualização - semana futura</span>`;
+else if(st==="done"||st==="perf")bh=`<span class="sb sb-done">Semana concluída</span>`;
+else if(pct>=thr)bh=`<span class="sb sb-ok">Meta atingida - pode avançar!</span>`;
+else if(pct>=50)bh=`<span class="sb sb-warn">Abaixo da meta - avance com débito</span>`;
+else if(done>0)bh=`<span class="sb sb-blk">Complete mais treinos para avançar</span>`;
 else bh=`<span class="sb sb-prog">Em andamento</span>`;
 document.getElementById("wBadge").innerHTML=bh;
 document.getElementById("bPrev").disabled=cw2<=1;
@@ -278,7 +333,7 @@ for(let di=0;di<7;di++){
       html+=`<div class="sc${isd?" done":""}"><div style="flex:1">
         <span class="sbadge" style="background:${c}33;color:${c};border:1px solid ${c}55">${s.per}</span>
         ${s.foc?`<span class="ftag ${fc}">${s.foc}</span>`:""}
-        <span class="slbl">${s.lbl}</span><div>`;
+        <span class="slbl">${s.lbl}${s.dur?' <span style="font-size:11px;opacity:0.7;font-weight:normal">'+s.dur+'</span>':''}</span><div>`;
       if(s.dsc.length>1){for(const x of s.dsc)html+=`<div class="sdesc sdi">${x}</div>`;}
       else html+=`<div class="sdesc">${s.dsc[0]}</div>`;
       html+=`</div></div>`;
@@ -306,7 +361,7 @@ for(const ph of PHS){
       <div class="wn ${nc[st]||""}">${si[st]||w}</div>
       <div style="flex:1"><div style="font-size:14px;font-weight:bold">Semana ${w}${fut?" <span style='font-size:11px;opacity:0.6'>(futura)</span>":""}</div>
       <div class="mbb"><div class="mbf" style="width:${fut?100:pct}%;background:${fut?"rgba(20,160,196,0.25)":pct>=thr?"#4CAF50":pct>=50?"#FF9800":ph.c}"></div></div></div>
-      <div style="font-size:12px;opacity:0.65;margin:0 8px">${fut?"previa":done+"/"+total}</div>
+      <div style="font-size:12px;opacity:0.65;margin:0 8px">${fut?"prévia":done+"/"+total}</div>
       <div style="opacity:0.4">›</div>
     </div>`;
   }
@@ -320,13 +375,13 @@ const ts=Array.from({length:12},(_,i)=>i+1).flatMap(w=>gck(w)).length;
 const td2=Object.values(ch).filter(Boolean).length;const pct=Math.round((td2/ts)*100);
 const tdb=Object.values(dch).length;const pdb=Object.values(dch).filter(Boolean).length;
 document.getElementById("stG").innerHTML=`
-  <div class="sc2"><div style="font-size:22px">✅</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${td2}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Sessoes feitas</div></div>
+  <div class="sc2"><div style="font-size:22px">✅</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${td2}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Sessões feitas</div></div>
   <div class="sc2"><div style="font-size:22px">📈</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pct}%</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Completo</div></div>
-  <div class="sc2"><div style="font-size:22px">&#128197;</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${unl}/12</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Semanas avancadas</div></div>
-  <div class="sc2"><div style="font-size:22px">⚠️</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pdb}/${tdb}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Debitos pagos</div></div>`;
-document.getElementById("pTot").textContent=td2+"/"+ts+" sessoes";
+  <div class="sc2"><div style="font-size:22px">&#128197;</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${unl}/12</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Semanas avançadas</div></div>
+  <div class="sc2"><div style="font-size:22px">⚠️</div><div style="font-size:24px;font-weight:bold;margin-top:4px">${pdb}/${tdb}</div><div style="font-size:12px;opacity:0.6;margin-top:2px">Débitos pagos</div></div>`;
+document.getElementById("pTot").textContent=td2+"/"+ts+" sessões";
 document.getElementById("pBar").style.width=pct+"%";
-const mls=[{l:"Primeira semana concluida",d:unl>1},{l:"Primeira negativa na barra",n:"Semana 5 - FOCO: PUXAR",d:unl>=5},{l:"Fase 1 concluida (4 semanas)",d:unl>4},{l:"Fase 2 concluida (8 semanas)",d:unl>8},{l:"10 BARRAS COMPLETAS!",d:false,g:true}];
+const mls=[{l:"Primeira semana concluída",d:unl>1},{l:"Primeira negativa na barra",n:"Semana 5 - FOCO: PUXAR",d:unl>=5},{l:"Fase 1 concluída (4 semanas)",d:unl>4},{l:"Fase 2 concluída (8 semanas)",d:unl>8},{l:"10 BARRAS COMPLETAS!",d:false,g:true}];
 let mh="";
 for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"✓":m.g?"🏆":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
 document.getElementById("mils").innerHTML=mh;
