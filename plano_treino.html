@@ -95,6 +95,38 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 .ib { background:rgba(255,255,255,0.07); border-radius:12px; padding:12px 14px; font-size:13px; opacity:0.85; line-height:1.6; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1); }
 .page { padding:14px 16px 0; display:none; }
 .page.active { display:block; }
+
+/* RESULT MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:flex; align-items:flex-end; }
+.modal { background:#0f2337; border-radius:20px 20px 0 0; padding:24px 20px 36px; width:100%; max-height:85vh; overflow-y:auto; border-top:1px solid rgba(255,255,255,0.15); }
+.modal-title { font-size:17px; font-weight:bold; margin-bottom:4px; }
+.modal-sub { font-size:12px; opacity:0.6; margin-bottom:20px; }
+.field-row { margin-bottom:16px; }
+.field-label { font-size:12px; opacity:0.7; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+.field-input { width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:12px 14px; color:#fff; font-size:16px; font-family:Georgia,serif; }
+.field-input:focus { outline:none; border-color:#14A0C4; background:rgba(255,255,255,0.14); }
+.field-input::placeholder { opacity:0.4; }
+.star-row { display:flex; gap:10px; margin-top:4px; }
+.star-btn { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.star-btn.sel { background:rgba(255,193,7,0.3); border-color:#FFD700; }
+.modal-save { width:100%; padding:14px; background:#4CAF50; border:none; border-radius:14px; color:#fff; font-size:16px; font-weight:bold; margin-top:6px; }
+.modal-cancel { width:100%; padding:10px; background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:14px; margin-top:8px; }
+
+/* RESULT BADGE on day */
+.res-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(20,160,196,0.2); border:1px solid rgba(20,160,196,0.4); border-radius:8px; padding:3px 8px; font-size:11px; color:#80DEEA; margin-top:6px; }
+
+/* HISTORY in progress tab */
+.hist-item { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
+.hist-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.hist-title { font-size:14px; font-weight:bold; }
+.hist-week { font-size:11px; opacity:0.55; }
+.hist-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.hist-stat { background:rgba(255,255,255,0.06); border-radius:8px; padding:8px; text-align:center; }
+.hist-stat-val { font-size:16px; font-weight:bold; }
+.hist-stat-lbl { font-size:10px; opacity:0.55; margin-top:2px; }
+.hist-feel { display:flex; gap:3px; margin-top:8px; }
+.hist-feel-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.15); }
+.hist-feel-dot.on { background:#FFD700; }
 </style>
 </head>
 <body>
@@ -143,7 +175,47 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
     <div class="pbbg" style="height:12px"><div class="pbf" id="pBar" style="width:0%;background:linear-gradient(90deg,#0D7377,#14A0C4,#4CAF50)"></div></div>
   </div>
   <div class="card"><div style="font-weight:bold;margin-bottom:14px">Marcos da Jornada</div><div id="mils"></div></div>
-  <button class="rb" onclick="rst()">Resetar progresso</button>
+  <div class="card" style="margin-bottom:14px">
+  <div style="font-weight:bold;margin-bottom:14px">📊 Histórico de Treinos</div>
+  <div id="histList"></div>
+</div>
+<button class="rb" onclick="rst()">Resetar progresso</button>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Registrar Resultados</div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="field-row">
+      <div class="field-label">⏱️ Duração (min)</div>
+      <input class="field-input" type="number" id="fTime" placeholder="Ex: 35" min="1" max="180">
+    </div>
+    <div class="field-row">
+      <div class="field-label">🔥 Calorias</div>
+      <input class="field-input" type="number" id="fCal" placeholder="Ex: 280" min="1" max="2000">
+    </div>
+    <div class="field-row">
+      <div class="field-label">❤️ FC Média (bpm)</div>
+      <input class="field-input" type="number" id="fFcAvg" placeholder="Ex: 135" min="40" max="220">
+    </div>
+    <div class="field-row">
+      <div class="field-label">💓 FC Máxima (bpm)</div>
+      <input class="field-input" type="number" id="fFcMax" placeholder="Ex: 162" min="40" max="220">
+    </div>
+    <div class="field-row">
+      <div class="field-label">😓 Sensação (1 = fácil · 5 = exaustivo)</div>
+      <div class="star-row" id="starRow">
+        <button class="star-btn" onclick="setStar(1)">😊</button>
+        <button class="star-btn" onclick="setStar(2)">🙂</button>
+        <button class="star-btn" onclick="setStar(3)">😐</button>
+        <button class="star-btn" onclick="setStar(4)">😓</button>
+        <button class="star-btn" onclick="setStar(5)">🥵</button>
+      </div>
+    </div>
+    <button class="modal-save" onclick="saveResult()">💾 Salvar resultado</button>
+    <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+  </div>
 </div>
 
 <script>
@@ -243,9 +315,9 @@ function dk(w,d,p){return`dbt_w${w}_d${d}_${p}`;}
 function gck(w){return gws(w).filter(s=>s.type!=="off");}
 function gpr(w){const s=gck(w);const dn=s.filter(s=>ch[sk(w,s.day,s.per)]).length;return{done:dn,total:s.length,pct:s.length?Math.round((dn/s.length)*100):0};}
 
-let cw2=1,exD=null,thr=70,ch={},dch={},unl=1;
-function ls(){try{const s=JSON.parse(localStorage.getItem("tv4")||"{}");ch=s.ch||{};dch=s.dch||{};thr=s.thr||70;unl=s.unl||1;cw2=s.cw2||1;}catch{}}
-function ss(){try{localStorage.setItem("tv4",JSON.stringify({ch,dch,thr,unl,cw2}));}catch{}}
+let cw2=1,exD=null,thr=70,ch={},dch={},unl=1,res={},modalKey=null,starSel=0;
+function ls(){try{const s=JSON.parse(localStorage.getItem("tv5")||"{}");ch=s.ch||{};dch=s.dch||{};thr=s.thr||70;unl=s.unl||1;cw2=s.cw2||1;res=s.res||{};}catch{}}
+function ss(){try{localStorage.setItem("tv5",JSON.stringify({ch,dch,thr,unl,cw2,res}));}catch{}}
 ls();
 
 function wst(w){const{pct}=gpr(w);if(w>unl)return'fut';if(w<unl)return'done';if(pct>=100)return'perf';if(pct>=thr)return'ok';if(pct>=50)return'warn';if(pct>0)return'blk';return'prog';}
@@ -331,7 +403,7 @@ for(let di=0;di<7;di++){
       const tc={swim:"#14A0C4",cali:"#0D7377",rest:"#6B8CAE",off:"#B0C4DE"};const c=tc[s.type]||"#888";
       const fc=s.foc==="PUXAR"?"fp":s.foc.includes("EMPURRAR")?"fe":s.foc.includes("CIRCUITO")?"fc":"";
       html+=`<div class="sc${isd?" done":""}"><div style="flex:1">
-        <span class="sbadge" style="background:${c}33;color:${c};border:1px solid ${c}55">${s.per}</span>
+
         ${s.foc?`<span class="ftag ${fc}">${s.foc}</span>`:""}
         <span class="slbl">${s.lbl}${s.dur?' <span style="font-size:11px;opacity:0.7;font-weight:normal">'+s.dur+'</span>':''}</span><div>`;
       if(s.dsc.length>1){for(const x of s.dsc)html+=`<div class="sdesc sdi">${x}</div>`;}
@@ -339,6 +411,22 @@ for(let di=0;di<7;di++){
       html+=`</div></div>`;
       if(!isO)html+=`<button class="cb${isd?" done":""}" ${fut?"disabled":""} onclick="${fut?"":"tc2("+cw2+","+s.day+",'"+s.per+"')"}">${isd?"✓":""}</button>`;
       html+=`</div>`;
+      // show result entry button if session is done and not future
+      if(!isO && !fut && isd){
+        const rk=sk(cw2,s.day,s.per)+"_res";
+        const r=res[rk];
+        if(r){
+          const feels=["😊","🙂","😐","😓","🥵"];
+          html+=`<div class="res-badge" onclick="openModal('${rk}','${s.lbl} — ${s.foc||s.per}',${cw2},${s.day},'${s.per}')">
+            ⏱️${r.time}min · 🔥${r.cal}kcal · ❤️${r.fcAvg}bpm${r.feel?` · ${feels[r.feel-1]}`:""}
+            <span style="opacity:0.6;margin-left:4px;font-size:10px">editar</span>
+          </div>`;
+        } else {
+          html+=`<button onclick="openModal('${rk}','${s.lbl} — ${s.foc||s.per}',${cw2},${s.day},'${s.per}')" style="width:100%;margin-top:6px;padding:9px;background:rgba(20,160,196,0.15);border:1px dashed rgba(20,160,196,0.4);border-radius:10px;color:#80DEEA;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
+            📊 Registrar tempo · calorias · FC
+          </button>`;
+        }
+      }
     }
     html+=`</div>`;
   }
@@ -347,6 +435,43 @@ document.getElementById("dayL").innerHTML=html;
 }
 
 function td(d){exD=exD===d?null:d;rw();}
+
+function openModal(rk,title,w,d,p){
+  modalKey=rk;
+  starSel=0;
+  document.getElementById("modalTitle").textContent="📊 "+title;
+  document.getElementById("modalSub").textContent="Semana "+w+" — "+DN[d];
+  const r=res[rk]||{};
+  document.getElementById("fTime").value=r.time||"";
+  document.getElementById("fCal").value=r.cal||"";
+  document.getElementById("fFcAvg").value=r.fcAvg||"";
+  document.getElementById("fFcMax").value=r.fcMax||"";
+  starSel=r.feel||0;
+  updateStars();
+  document.getElementById("modalOverlay").style.display="flex";
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById("modalOverlay"))
+    document.getElementById("modalOverlay").style.display="none";
+}
+function setStar(n){starSel=n;updateStars();}
+function updateStars(){
+  document.querySelectorAll(".star-btn").forEach((b,i)=>{
+    b.classList.toggle("sel",i<starSel);
+  });
+}
+function saveResult(){
+  const t=document.getElementById("fTime").value;
+  const c=document.getElementById("fCal").value;
+  const fa=document.getElementById("fFcAvg").value;
+  const fm=document.getElementById("fFcMax").value;
+  if(!t&&!c&&!fa){sn("Preencha pelo menos um campo!","#FF9800");return;}
+  res[modalKey]={time:t||null,cal:c||null,fcAvg:fa||null,fcMax:fm||null,feel:starSel||null,ts:Date.now()};
+  ss();
+  document.getElementById("modalOverlay").style.display="none";
+  sn("✅ Resultado salvo!","#4CAF50");
+  rw();
+}
 function tc2(w,d,p){if(isF(w))return;const k=sk(w,d,p);ch[k]=!ch[k];ss();if(ch[k])sn("✅ Treino marcado!","#4CAF50");rw();}
 
 function ro(){
@@ -385,6 +510,35 @@ const mls=[{l:"Primeira semana concluída",d:unl>1},{l:"Primeira negativa na bar
 let mh="";
 for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"✓":m.g?"🏆":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
 document.getElementById("mils").innerHTML=mh;
+
+  // History
+  const feels=["😊","🙂","😐","😓","🥵"];
+  const entries=Object.entries(res).filter(([k,v])=>v&&(v.time||v.cal||v.fcAvg));
+  entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  let hh="";
+  if(entries.length===0){
+    hh=`<div style="opacity:0.5;font-size:13px;text-align:center;padding:10px">Nenhum resultado registrado ainda.<br>Marque um treino como feito para registrar!</div>`;
+  } else {
+    for(const [k,r] of entries.slice(0,20)){
+      const m=k.match(/w(\d+)_d(\d+)/);
+      const wn=m?parseInt(m[1]):0;const dn2=m?parseInt(m[2]):0;
+      const sname=wn&&dn2!==undefined?DN[dn2]:"";
+      hh+=`<div class="hist-item">
+        <div class="hist-header">
+          <div class="hist-title">${sname}</div>
+          <div class="hist-week">Semana ${wn}</div>
+        </div>
+        <div class="hist-grid">
+          <div class="hist-stat"><div class="hist-stat-val">${r.time||"—"}</div><div class="hist-stat-lbl">min</div></div>
+          <div class="hist-stat"><div class="hist-stat-val">${r.cal||"—"}</div><div class="hist-stat-lbl">kcal</div></div>
+          <div class="hist-stat"><div class="hist-stat-val">${r.fcAvg||"—"}</div><div class="hist-stat-lbl">FC méd.</div></div>
+        </div>
+        ${r.fcMax?`<div style="font-size:12px;opacity:0.6;margin-top:6px">FC máxima: ${r.fcMax} bpm</div>`:""}
+        ${r.feel?`<div class="hist-feel">${[1,2,3,4,5].map(i=>`<div class="hist-feel-dot${i<=r.feel?" on":""}"></div>`).join("")}<span style="font-size:11px;opacity:0.6;margin-left:6px">${feels[r.feel-1]} sensação</span></div>`:""}
+      </div>`;
+    }
+  }
+  document.getElementById("histList").innerHTML=hh;
 }
 
 function ug(){document.getElementById("gBar").style.width=((unl-1)/12*100)+"%";document.getElementById("gLbl").textContent="Semana "+unl+" de 12";}
