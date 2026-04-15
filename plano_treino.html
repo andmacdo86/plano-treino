@@ -8,6 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a1628">
 <link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <title>Plano Treino 12 Semanas</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,7 +22,7 @@ button { cursor: pointer; font-family: inherit; }
 .pbf { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
 .pbl { font-size: 12px; opacity: 0.8; white-space: nowrap; }
 .nav { display: flex; gap: 8px; padding: 14px 16px 0; }
-.nav-btn { flex: 1; padding: 9px 4px; border-radius: 10px; border: none; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 13px; transition: all 0.2s; }
+.nav-btn { flex: 1; padding: 9px 2px; border-radius: 10px; border: none; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 11px; transition: all 0.2s; }
 .nav-btn.active { background: rgba(255,255,255,0.95); color: #0D7377; font-weight: bold; }
 .notif { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); color: #fff; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: bold; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: fi 0.2s ease; white-space: nowrap; }
 @keyframes fi { from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
@@ -96,6 +97,14 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 .page { padding:14px 16px 0; display:none; }
 .page.active { display:block; }
 
+/* HISTORY */
+.hfbtn { flex:1; padding:8px 4px; border-radius:10px; border:none; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); font-size:12px; font-family:Georgia,serif; transition:all 0.2s; }
+.hfbtn.active { background:rgba(255,255,255,0.9); color:#0D7377; font-weight:bold; }
+.chart-card { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:16px; margin-bottom:14px; }
+.chart-title { font-size:15px; font-weight:bold; margin-bottom:2px; }
+.chart-sub { font-size:11px; opacity:0.55; margin-bottom:14px; }
+.no-data { text-align:center; opacity:0.45; font-size:13px; padding:20px 0; }
+
 /* RESULT MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:flex; align-items:flex-end; }
 .modal { background:#0f2337; border-radius:20px 20px 0 0; padding:24px 20px 36px; width:100%; max-height:85vh; overflow-y:auto; border-top:1px solid rgba(255,255,255,0.15); }
@@ -138,7 +147,8 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
 <div class="notif" id="notif" style="display:none"></div>
 <div class="nav">
   <button class="nav-btn active" onclick="sv('week')">Semana</button>
-  <button class="nav-btn" onclick="sv('overview')">Visao Geral</button>
+  <button class="nav-btn" onclick="sv('overview')">Visão Geral</button>
+  <button class="nav-btn" onclick="sv('history')">Histórico</button>
   <button class="nav-btn" onclick="sv('progress')">Progresso</button>
 </div>
 
@@ -175,11 +185,49 @@ input[type=range] { width: 100%; accent-color: #14A0C4; }
     <div class="pbbg" style="height:12px"><div class="pbf" id="pBar" style="width:0%;background:linear-gradient(90deg,#0D7377,#14A0C4,#4CAF50)"></div></div>
   </div>
   <div class="card"><div style="font-weight:bold;margin-bottom:14px">Marcos da Jornada</div><div id="mils"></div></div>
-  <div class="card" style="margin-bottom:14px">
-  <div style="font-weight:bold;margin-bottom:14px">📊 Histórico de Treinos</div>
-  <div id="histList"></div>
-</div>
+  
 <button class="rb" onclick="rst()">Resetar progresso</button>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="view-history">
+  <!-- Summary cards -->
+  <div class="sgr" style="margin-top:14px" id="hSumGrid"></div>
+
+  <!-- Filter buttons -->
+  <div style="display:flex;gap:8px;margin-bottom:14px" id="hFilterWrap">
+    <button class="hfbtn active" onclick="setHFilter('all')">Todos</button>
+    <button class="hfbtn" onclick="setHFilter('swim')">🏊 Natação</button>
+    <button class="hfbtn" onclick="setHFilter('cali')">💪 Calistenia</button>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-card">
+    <div class="chart-title">❤️ FC Média (bpm)</div>
+    <div class="chart-sub">Esperado cair com o tempo — sinal de condicionamento</div>
+    <canvas id="cFcAvg" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">💓 FC Máxima (bpm)</div>
+    <div class="chart-sub">Controle de intensidade dos treinos</div>
+    <canvas id="cFcMax" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">🔥 Calorias</div>
+    <div class="chart-sub">Tende a crescer conforme o volume aumenta</div>
+    <canvas id="cCal" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">⏱️ Duração (min)</div>
+    <div class="chart-sub">Consistência ao longo das semanas</div>
+    <canvas id="cTime" height="180"></canvas>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">😓 Sensação por Treino</div>
+    <div class="chart-sub">1 = fácil · 5 = exaustivo — ideal estabilizar em 2–3</div>
+    <canvas id="cFeel" height="180"></canvas>
+  </div>
+  <div style="height:20px"></div>
 </div>
 
 <!-- RESULT MODAL -->
@@ -315,7 +363,7 @@ function dk(w,d,p){return`dbt_w${w}_d${d}_${p}`;}
 function gck(w){return gws(w).filter(s=>s.type!=="off");}
 function gpr(w){const s=gck(w);const dn=s.filter(s=>ch[sk(w,s.day,s.per)]).length;return{done:dn,total:s.length,pct:s.length?Math.round((dn/s.length)*100):0};}
 
-let cw2=1,exD=null,thr=70,ch={},dch={},unl=1,res={},modalKey=null,starSel=0;
+let cw2=1,exD=null,thr=70,ch={},dch={},unl=1,res={},modalKey=null,starSel=0,hFilter='all';
 function ls(){try{const s=JSON.parse(localStorage.getItem("tv5")||"{}");ch=s.ch||{};dch=s.dch||{};thr=s.thr||70;unl=s.unl||1;cw2=s.cw2||1;res=s.res||{};}catch{}}
 function ss(){try{localStorage.setItem("tv5",JSON.stringify({ch,dch,thr,unl,cw2,res}));}catch{}}
 ls();
@@ -511,38 +559,171 @@ let mh="";
 for(const m of mls)mh+=`<div class="ms"><div class="md${m.d?" done":m.g?" goal":""}">${m.d?"✓":m.g?"🏆":""}</div><div><div style="font-size:14px;font-weight:${m.g?"bold":"normal"}">${m.l}</div>${m.n?`<div style="font-size:12px;opacity:0.55">${m.n}</div>`:""}</div></div>`;
 document.getElementById("mils").innerHTML=mh;
 
-  // History
-  const feels=["😊","🙂","😐","😓","🥵"];
-  const entries=Object.entries(res).filter(([k,v])=>v&&(v.time||v.cal||v.fcAvg));
-  entries.sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
-  let hh="";
-  if(entries.length===0){
-    hh=`<div style="opacity:0.5;font-size:13px;text-align:center;padding:10px">Nenhum resultado registrado ainda.<br>Marque um treino como feito para registrar!</div>`;
-  } else {
-    for(const [k,r] of entries.slice(0,20)){
-      const m=k.match(/w(\d+)_d(\d+)/);
-      const wn=m?parseInt(m[1]):0;const dn2=m?parseInt(m[2]):0;
-      const sname=wn&&dn2!==undefined?DN[dn2]:"";
-      hh+=`<div class="hist-item">
-        <div class="hist-header">
-          <div class="hist-title">${sname}</div>
-          <div class="hist-week">Semana ${wn}</div>
-        </div>
-        <div class="hist-grid">
-          <div class="hist-stat"><div class="hist-stat-val">${r.time||"—"}</div><div class="hist-stat-lbl">min</div></div>
-          <div class="hist-stat"><div class="hist-stat-val">${r.cal||"—"}</div><div class="hist-stat-lbl">kcal</div></div>
-          <div class="hist-stat"><div class="hist-stat-val">${r.fcAvg||"—"}</div><div class="hist-stat-lbl">FC méd.</div></div>
-        </div>
-        ${r.fcMax?`<div style="font-size:12px;opacity:0.6;margin-top:6px">FC máxima: ${r.fcMax} bpm</div>`:""}
-        ${r.feel?`<div class="hist-feel">${[1,2,3,4,5].map(i=>`<div class="hist-feel-dot${i<=r.feel?" on":""}"></div>`).join("")}<span style="font-size:11px;opacity:0.6;margin-left:6px">${feels[r.feel-1]} sensação</span></div>`:""}
-      </div>`;
-    }
-  }
-  document.getElementById("histList").innerHTML=hh;
 }
 
 function ug(){document.getElementById("gBar").style.width=((unl-1)/12*100)+"%";document.getElementById("gLbl").textContent="Semana "+unl+" de 12";}
 function sn(msg,color="#4CAF50"){const n=document.getElementById("notif");n.textContent=msg;n.style.background=color;n.style.display="block";setTimeout(()=>n.style.display="none",2500);}
+function setHFilter(f){
+  hFilter=f;
+  document.querySelectorAll(".hfbtn").forEach((b,i)=>{
+    b.classList.toggle("active",["all","swim","cali"][i]===f);
+  });
+  rh();
+}
+
+let _charts={};
+function destroyChart(id){if(_charts[id]){_charts[id].destroy();delete _charts[id];}}
+
+function makeChart(id,type,labels,datasets,opts){
+  destroyChart(id);
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  _charts[id]=new Chart(ctx,{
+    type,
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:datasets.length>1,labels:{color:"rgba(255,255,255,0.7)",font:{size:11},boxWidth:12}},
+        tooltip:{
+          backgroundColor:"rgba(10,22,40,0.95)",
+          titleColor:"#fff",
+          bodyColor:"rgba(255,255,255,0.8)",
+          borderColor:"rgba(255,255,255,0.15)",
+          borderWidth:1,
+          callbacks:{
+            label:function(ctx){return " "+ctx.dataset.label+": "+ctx.parsed.y+(opts&&opts.unit?" "+opts.unit:"");}
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{color:"rgba(255,255,255,0.5)",font:{size:10}},grid:{color:"rgba(255,255,255,0.05)"}},
+        y:{ticks:{color:"rgba(255,255,255,0.5)",font:{size:10}},grid:{color:"rgba(255,255,255,0.07)"},beginAtZero:false,...(opts&&opts.yOpts||{})}
+      },
+      ...((opts&&opts.extra)||{})
+    }
+  });
+}
+
+function rh(){
+  // Collect all result entries
+  const DN2=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+  const entries=[];
+  for(const[k,r] of Object.entries(res)){
+    if(!r||(r.time===null&&r.cal===null&&r.fcAvg===null))continue;
+    const m=k.match(/w(\d+)_d(\d+)_(.+)_res/);
+    if(!m)continue;
+    const w=parseInt(m[1]),d=parseInt(m[2]);
+    // determine type from session
+    const sess=gws(w).find(s=>s.day===d);
+    const type=sess?sess.type:"swim";
+    if(hFilter!=="all"&&type!==hFilter)continue;
+    const label="S"+w+" "+DN2[d];
+    entries.push({w,d,type,label,r,ts:r.ts||0});
+  }
+  entries.sort((a,b)=>a.ts-b.ts);
+
+  // Summary cards
+  const swimE=entries.filter(e=>e.type==="swim");
+  const caliE=entries.filter(e=>e.type==="cali");
+  const allFcAvg=entries.map(e=>parseFloat(e.r.fcAvg)).filter(x=>x>0);
+  const allCal=entries.map(e=>parseFloat(e.r.cal)).filter(x=>x>0);
+  const totalCal=allCal.reduce((a,b)=>a+b,0);
+  const avgFc=allFcAvg.length?Math.round(allFcAvg.reduce((a,b)=>a+b,0)/allFcAvg.length):null;
+
+  document.getElementById("hSumGrid").innerHTML=`
+    <div class="sc2"><div style="font-size:20px">🏃</div><div style="font-size:22px;font-weight:bold;margin-top:4px">${entries.length}</div><div style="font-size:11px;opacity:0.6;margin-top:2px">Treinos registrados</div></div>
+    <div class="sc2"><div style="font-size:20px">❤️</div><div style="font-size:22px;font-weight:bold;margin-top:4px">${avgFc||"—"}</div><div style="font-size:11px;opacity:0.6;margin-top:2px">FC média geral</div></div>
+    <div class="sc2"><div style="font-size:20px">🔥</div><div style="font-size:22px;font-weight:bold;margin-top:4px">${totalCal?Math.round(totalCal):"—"}</div><div style="font-size:11px;opacity:0.6;margin-top:2px">kcal acumuladas</div></div>
+    <div class="sc2"><div style="font-size:20px">🏊</div><div style="font-size:22px;font-weight:bold;margin-top:4px">${swimE.length}+${caliE.length}</div><div style="font-size:11px;opacity:0.6;margin-top:2px">Nat. + Calist.</div></div>
+  `;
+
+  if(entries.length===0){
+    ["cFcAvg","cFcMax","cCal","cTime","cFeel"].forEach(id=>{
+      destroyChart(id);
+      const c=document.getElementById(id);
+      if(c)c.parentElement.querySelector(".chart-sub").insertAdjacentHTML("afterend",
+        entries.length===0?'':'');
+    });
+    document.querySelectorAll(".chart-card canvas").forEach(c=>{c.style.display="none";});
+    document.querySelectorAll(".chart-card").forEach(c=>{
+      if(!c.querySelector(".no-data"))
+        c.insertAdjacentHTML("beforeend",'<div class="no-data">Registre resultados nos treinos para ver os gráficos aqui!</div>');
+    });
+    return;
+  }
+  document.querySelectorAll(".chart-card canvas").forEach(c=>c.style.display="block");
+  document.querySelectorAll(".no-data").forEach(c=>c.remove());
+
+  const labels=entries.map(e=>e.label);
+  const swimColor="rgba(20,160,196,1)";
+  const caliColor="rgba(13,115,119,1)";
+  const swimBg="rgba(20,160,196,0.15)";
+  const caliBg="rgba(13,115,119,0.15)";
+
+  function makeDS(entries,field,label,col,bg){
+    return {
+      label,
+      data:entries.map(e=>parseFloat(e.r[field])||null),
+      borderColor:col,backgroundColor:bg,
+      tension:0.35,pointRadius:5,pointHoverRadius:8,
+      pointBackgroundColor:col,fill:true,spanGaps:false
+    };
+  }
+
+  if(hFilter==="all"){
+    // Split by type with same x-axis labels
+    const swimData=entries.map(e=>e.type==="swim"?parseFloat(e.r.fcAvg)||null:null);
+    const caliData=entries.map(e=>e.type==="cali"?parseFloat(e.r.fcAvg)||null:null);
+    makeChart("cFcAvg","line",labels,[
+      {label:"🏊 Natação",data:swimData,borderColor:swimColor,backgroundColor:swimBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:swimColor,fill:true,spanGaps:false},
+      {label:"💪 Calistenia",data:caliData,borderColor:caliColor,backgroundColor:caliBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:caliColor,fill:true,spanGaps:false}
+    ],{unit:"bpm"});
+
+    const swimFcMax=entries.map(e=>e.type==="swim"?parseFloat(e.r.fcMax)||null:null);
+    const caliFcMax=entries.map(e=>e.type==="cali"?parseFloat(e.r.fcMax)||null:null);
+    makeChart("cFcMax","line",labels,[
+      {label:"🏊 Natação",data:swimFcMax,borderColor:swimColor,backgroundColor:swimBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:swimColor,fill:true,spanGaps:false},
+      {label:"💪 Calistenia",data:caliFcMax,borderColor:caliColor,backgroundColor:caliBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:caliColor,fill:true,spanGaps:false}
+    ],{unit:"bpm"});
+
+    const swimCal=entries.map(e=>e.type==="swim"?parseFloat(e.r.cal)||null:null);
+    const caliCal=entries.map(e=>e.type==="cali"?parseFloat(e.r.cal)||null:null);
+    makeChart("cCal","line",labels,[
+      {label:"🏊 Natação",data:swimCal,borderColor:swimColor,backgroundColor:swimBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:swimColor,fill:true,spanGaps:false},
+      {label:"💪 Calistenia",data:caliCal,borderColor:caliColor,backgroundColor:caliBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:caliColor,fill:true,spanGaps:false}
+    ],{unit:"kcal"});
+
+    const swimTime=entries.map(e=>e.type==="swim"?parseFloat(e.r.time)||null:null);
+    const caliTime=entries.map(e=>e.type==="cali"?parseFloat(e.r.time)||null:null);
+    makeChart("cTime","line",labels,[
+      {label:"🏊 Natação",data:swimTime,borderColor:swimColor,backgroundColor:swimBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:swimColor,fill:true,spanGaps:false},
+      {label:"💪 Calistenia",data:caliTime,borderColor:caliColor,backgroundColor:caliBg,tension:0.35,pointRadius:5,pointHoverRadius:8,pointBackgroundColor:caliColor,fill:true,spanGaps:false}
+    ],{unit:"min"});
+  } else {
+    const col=hFilter==="swim"?swimColor:caliColor;
+    const bg=hFilter==="swim"?swimBg:caliBg;
+    const lbl=hFilter==="swim"?"🏊 Natação":"💪 Calistenia";
+    makeChart("cFcAvg","line",labels,[makeDS(entries,"fcAvg",lbl,col,bg)],{unit:"bpm"});
+    makeChart("cFcMax","line",labels,[makeDS(entries,"fcMax",lbl,col,bg)],{unit:"bpm"});
+    makeChart("cCal","line",labels,[makeDS(entries,"cal",lbl,col,bg)],{unit:"kcal"});
+    makeChart("cTime","line",labels,[makeDS(entries,"time",lbl,col,bg)],{unit:"min"});
+  }
+
+  // Feel - bar chart always combined
+  const feelColors=entries.map(e=>{
+    const f=e.r.feel||0;
+    return f<=1?"rgba(76,175,80,0.8)":f<=2?"rgba(139,195,74,0.8)":f<=3?"rgba(255,193,7,0.8)":f<=4?"rgba(255,152,0,0.8)":"rgba(244,67,54,0.8)";
+  });
+  makeChart("cFeel","bar",labels,[{
+    label:"Sensação",
+    data:entries.map(e=>e.r.feel||null),
+    backgroundColor:feelColors,
+    borderRadius:6,
+    borderSkipped:false,
+  }],{unit:"/ 5",yOpts:{min:0,max:5,ticks:{stepSize:1}},extra:{plugins:{legend:{display:false}}}});
+}
+
 function rst(){if(confirm("Zerar todo o progresso?")){ch={};dch={};unl=1;cw2=1;exD=null;ss();rw();ug();}}
 
 rw();ug();
